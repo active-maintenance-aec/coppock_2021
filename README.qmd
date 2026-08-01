@@ -1,0 +1,514 @@
+---
+title: "Reproducibility Report: Coppock (2020)"
+subtitle: "Visualize as You Randomize: Design-Based Statistical Graphs for Randomized Experiments"
+format:
+  gfm:
+    output-file: README.md
+    toc: true
+  pdf:
+    output-file: coppock_2020_report.pdf
+    toc: true
+    toc-depth: 2
+    number-sections: true
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(here)
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+
+here::i_am("README.qmd")
+
+# kableExtra styling and the vector figures are LaTeX-only; the GitHub README build
+# takes plain pipe tables and the PNG copies.
+latex_out <- knitr::is_latex_output()
+
+latex_only <- function(k, f) if (latex_out) f(k) else k
+
+gt <- read_csv(here::here("ground_truth", "coppock_2020_ground_truth.csv"),
+               show_col_types = FALSE)
+
+design_parameters <- read_csv(here::here("maintained", "output", "text_design_parameters.csv"),
+                              show_col_types = FALSE)
+
+generator_comparison <- read_csv(
+  here::here("maintained", "output", "make_datasets_deposit_comparison.csv"),
+  show_col_types = FALSE
+)
+
+archive_agreement <- read_csv(
+  here::here("maintained", "output", "text_archive_agreement.csv"),
+  show_col_types = FALSE
+)
+
+stata_comparison <- read_csv(
+  here::here("maintained", "output", "text_stata_equivalent.csv"),
+  show_col_types = FALSE
+)
+```
+
+*Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
+
+This repository holds the actively maintained replication code for Coppock (2020), together with the reproducibility report that documents what the original archive did and did not do. It is part of a program applying the maintenance proposal in Peer, Orr and Coppock (2021, *PS: Political Science & Politics*, doi [10.1017/S1049096521000366](https://doi.org/10.1017/S1049096521000366)) to a set of published archives.
+
+| | |
+|---|---|
+| Chapter | [10.1017/9781108777919.022](https://doi.org/10.1017/9781108777919.022) |
+| Replication archive | [10.7910/DVN/VE6VSR](https://doi.org/10.7910/DVN/VE6VSR) |
+| Pre-analysis plan | none: the chapter analyses simulated data |
+
+**The data are not redistributed here.** The deposit is 280 KB across 17 files and lives at Harvard Dataverse, which is the only copy this repository points at. `download_original.R` fetches it and verifies every file; `original_manifest.csv` pins the Dataverse file identifiers, the UNF of each ingested data file, the deposit's own directory layout, and two checksums per file: the MD5 of the bytes Dataverse serves for `?format=original`, which is what this code was written against, and the MD5 Dataverse publishes. Here the two agree for all seventeen. They do not always, so the script verifies against the served bytes and reports any disagreement. Either way the exact bytes are pinned in version control even though the bytes themselves are not.
+
+**Repository layout.** `maintained/` is the maintained rewrite: one script per published figure, writing to `output/`, which is committed so a reader can compare a fresh run against it without downloading anything. `ground_truth/` ties every claim the chapter makes about its figures to the code that produces it, and is itself built by a script rather than typed. `original/` is created by the download script and is deliberately absent from the repository. This file is the reproducibility report, also available as a PDF in `report/`.
+
+**License.** CC0 1.0 Universal, matching the terms of the deposit this repository maintains, so nothing in the chain is more restrictive than the archive itself. See `LICENSE`.
+
+**To reproduce.** Clone or download the repository, open `coppock_2020.Rproj`, and run:
+
+``` r
+source("run_all.R")
+```
+
+That fetches the deposit, verifies its seventeen checksums, produces every figure into `maintained/output/`, and rebuilds the ground truth table from those outputs. It takes about ten seconds. Required packages: tidyverse, estimatr, broom, margins, DeclareDesign, knitr, kableExtra, here. Paths resolve through `here`, so nothing depends on the working directory and the scripts work equally well under `Rscript` outside RStudio. Individual scripts can be run on their own in any order, with two exceptions: `text_archive_agreement.R` reads the figure scripts' output and `build_ground_truth.R` reads everything, so both come last.
+
+A successful run overwrites `maintained/output/`, which is committed: **`git diff` on that folder is the reproduction check**, and the CSV and PNG output should come back byte-identical. The fourteen PDF figures always show as changed, because a PDF records the time it was written; compare their PNG twins instead.
+
+# Summary
+
+```{r summary_setup}
+n_claims <- nrow(gt)
+n_verifiable <- sum(!is.na(gt$match))
+n_match <- sum(gt$match == 1, na.rm = TRUE)
+n_fail <- sum(gt$match == 0, na.rm = TRUE)
+n_unverifiable <- sum(is.na(gt$match))
+n_generator_agree <- sum(generator_comparison$agrees)
+n_generator_total <- nrow(generator_comparison)
+max_agreement_gap <- max(archive_agreement$max_abs_difference)
+n_agreement_values <- sum(archive_agreement$n_values)
+```
+
+Two questions, answered before the detail.
+
+## Does the deposited archive run?
+
+Not on its own. Six of the archive's eight R scripts fail in a clean R session, and the two that survive do so by accident: `blocked.R` and `interaction.R` happen to load `estimatr`, which re-exports the `tidy()` generic the other scripts call without loading anything that provides it. Four scripts stop at `could not find function "tidy"` and one at `could not find function "lm_lin"`, all for the same reason, which is that every script opens with `library(tidyverse)` and nothing else. Adding `library(broom)` and `library(estimatr)` makes all seven analysis scripts run to completion, so the failure is a missing declaration rather than a missing package. This is what a script that has only ever been run in a warm session looks like from outside: it works for its author and stops for everybody else.
+
+The eighth script is the data generator, and it fails for three separate reasons. `declare_assignment()` rejects the pre-1.0 DeclareDesign syntax, `draw_likert()` no longer supplies default cut points, and `declare_sampling()` rejects its own pre-1.0 syntax at the last design in the file. All three are repairable from the deposit alone, and none requires an old version of anything: DeclareDesign 1.1.1 still accepts the old assignment and sampling syntax behind `legacy = TRUE`.
+
+## Does the maintained rewrite reproduce the chapter?
+
+Yes for the figures, with three exceptions, two of which belong to the chapter rather than to the code. Of `r n_claims` recorded claims, `r n_verifiable` can be checked against the published chapter; `r n_match` match and `r n_fail` do not. The `r n_unverifiable` remaining are quantities the chapter never states, which is a large share, because this is a methods chapter with no tables and no reported estimates: its figures are drawn from simulated data and its claims are about shape and direction rather than magnitude.
+
+```{r summary_table}
+tibble::tribble(
+  ~Component, ~Verdict,
+  "Figures 17.1, 17.2, 17.5, 17.6, 17.7, 17.8", "Reproduce",
+  "Figure 17.3 (blocked, faceted by block)", "Figure reproduces; the text describing it transposes the two neighborhoods",
+  "Figure 17.4 (clustered), estimates", "Reproduce",
+  "Figure 17.4 (clustered), stated outcome scale", "Eight of 441 outcomes fall outside the stated 400 to 1600 range",
+  "Figure 17.4 (clustered), panel (b) axis label", "The deposited script does not produce the published label",
+  "Data generator (seven simulated datasets)", paste0(n_generator_agree, " of ", n_generator_total, " columns regenerate identically")
+) |>
+  kable(booktabs = TRUE, caption = "Reproduction verdict by component.") |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("striped", "hold_position", "scale_down"), font_size = 8) |>
+    column_spec(1, width = "5.5cm") |>
+    column_spec(2, width = "7cm"))
+```
+
+The three failures are worth naming. The chapter says the blocked experiment shows "small effects of treatment in neighborhood 1 and large negative effects of treatment in neighborhood 2"; the two neighborhoods are the other way round, in the deposited data, in the deposited generator, and in the published figure. The chapter says the clustered outcome is "measured on a 400-1600-point scale"; eight of the 441 simulated outcomes fall outside it and both panels clip. And the deposited code labels both panels of Figure 17.4 as classroom averages, while the published panel (b), which plots students, is labelled "Outcome variable: SAT score", so that label was corrected somewhere between the deposit and the book.
+
+# Chapter overview
+
+**Citation**: Coppock, A. (2020). "Visualize as you randomize: Design-based statistical graphs for randomized experiments." In J. N. Druckman and D. P. Green (eds.), *Advances in Experimental Political Science*, 320-336. Cambridge University Press. DOI: 10.1017/9781108777919.022. Crossref dates the volume to April 2021; this program indexes the chapter as 2020, following the author's own catalogue.
+
+**Summary**: A methods chapter arguing that a graph of an experiment should encode the design as well as the result. Two design principles do the work: invite visual comparisons across randomly formed groups rather than across groups formed before or after treatment, and show the fitted model and its uncertainty in data space rather than on its own. A third asks that design features like blocking, clustering and differential assignment probabilities be mapped to visual cues. The chapter works through seven designs, each with a panel that follows the advice and a panel that does not: a two-arm trial, a blocked experiment, the same blocked experiment faceted two ways, a cluster-randomized trial, covariate adjustment shown as a residual-on-residual plot, an interaction with a continuous covariate, two-sided noncompliance, and attrition with extreme value bounds. All of the data are simulated, so the chapter reports no estimates and prints no tables. Its empirical content is the figures themselves and the design parameters it states in prose.
+
+# Original archive reproducibility
+
+**Archive source**: Harvard Dataverse, DOI 10.7910/DVN/VE6VSR. Seventeen files under a single `replication_archive` directory label: eight R scripts, one Stata `.do` file, seven simulated datasets and a README. All seventeen served checksums match the published ones, and the deposit's own README describes the contents accurately, which is not something to take for granted.
+
+```{r repro_table}
+tibble(
+  Script = c(
+    "two_arm_trial.R",
+    "blocked.R",
+    "clustered.R",
+    "covariate_adjustment.R",
+    "noncompliance.R",
+    "interaction.R",
+    "attrition.R",
+    "make_datasets.R",
+    "two_arm_trial.do"
+  ),
+  Status = c(
+    "Fails: could not find function 'tidy'",
+    "Runs",
+    "Fails: could not find function 'tidy'",
+    "Fails: could not find function 'lm_lin'",
+    "Fails: could not find function 'tidy'",
+    "Runs",
+    "Fails: could not find function 'tidy'",
+    "Fails: three separate pre-1.0 DeclareDesign incompatibilities",
+    "Not run: no Stata licence here, and it reads from a data/ path the deposit does not contain"
+  ),
+  Resolution = c(
+    "library(broom)",
+    "No changes required",
+    "library(broom)",
+    "library(estimatr), then library(broom)",
+    "library(broom)",
+    "No changes required",
+    "library(broom)",
+    "legacy = TRUE on assignment and sampling; explicit breaks for draw_likert",
+    "Its arithmetic is reproduced in R and compared against the R figure"
+  )
+) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Script", "Status in a clean R session", "Resolution"),
+    caption = "Original archive reproducibility, checked against R 4.6.0."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "scale_down"), font_size = 7) |>
+    column_spec(1, width = "3.5cm") |>
+    column_spec(2, width = "4.5cm") |>
+    column_spec(3, width = "4.5cm"))
+```
+
+Every package the archive names still installs from CRAN: `tidyverse`, `estimatr`, `DeclareDesign`, `MASS`, `margins` and `ggrepel`. Nothing here is unmaintained, and nothing needed substituting for want of a package. Two patterns that commonly break in archives of this vintage do not break here. `do(tidy(...))`, `gather()` and `spread()` emit no warnings at all, being superseded rather than deprecated. And `stat_smooth(method = "lm_robust")` is recognised by ggplot2 4.0.3, because `stat_smooth` resolves a method string with `match.fun()` and `estimatr` is attached by the time the plot is drawn.
+
+Running the archive also leaves seven files behind that the deposit does not contain: six figure PDFs written into whatever directory the scripts were run from, plus an `Rplots.pdf` from the device R opens under `Rscript`. Those scripts were run in a scratch copy for that reason, and `download_original.R` prints a warning if anything but the deposit turns up in `original/`.
+
+## The data generator
+
+`make_datasets.R` is the interesting failure. It declares seven designs in the DeclareDesign syntax of 2019, writes out the seven datasets the analysis scripts read, and stops at the third line of the first design. There are three incompatibilities, and none of them requires an old version:
+
+* `declare_assignment(m = 100)` and its blocked and clustered variants. DeclareDesign 1.0 removed the named-argument form, and its own error message names the replacement. Passing `legacy = TRUE` restores the old behaviour in 1.1.1.
+* `draw_likert(0.5 * Z + U)`. `fabricatr` no longer supplies default cut points and now demands `breaks`, or `min`, `max` and `bins`. The cut points the deposit was built with are recoverable from the deposited file, and are the unit-width breaks from -2.5 to 2.5.
+* `declare_sampling(prob_unit = pnorm(X), simple = TRUE)`, which fails the same way as the assignment steps and takes the same `legacy = TRUE`.
+
+Repaired, the generator runs to the end, and what it produces is the subject of a later section.
+
+## The Stata file
+
+The deposit's README says its Stata file "produces something similar to Figure 1", which is a claim about output that nobody without a Stata licence can check by running it. The file is nine lines of arithmetic, so `text_stata_equivalent.R` reproduces them in R and compares the result against the intervals the R script draws.
+
+```{r stata_table}
+stata_comparison |>
+  transmute(
+    Condition = condition,
+    Method = method,
+    Mean = sprintf("%.3f", estimate),
+    `Lower` = sprintf("%.3f", conf.low),
+    `Upper` = sprintf("%.3f", conf.high)
+  ) |>
+  kable(booktabs = TRUE,
+        caption = "The deposited Stata file's intervals against the R script's, on the same data.") |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "scale_down"), font_size = 8) |>
+    column_spec(2, width = "7cm"))
+```
+
+The claim holds. The group means are identical, and the intervals differ only because the Stata file builds a normal-approximation interval from the group standard deviation where the R script builds an HC2 interval on the t distribution. On a 0 to 1 outcome the widths differ by at most 0.0024. What the Stata file cannot do is run as deposited: it reads `data/two_arm_simulated_data.csv` and the deposit has no `data/` directory, so the path has to be repaired before the file will open its own data.
+
+# Number-by-number comparison
+
+The ground truth is built by `ground_truth/build_ground_truth.R`, which reads every archive and rewrite value out of `maintained/output/` and writes the table. Nothing in it is typed except the values read from the published chapter, and those are only ever comparison targets: no published number is an input to any computation in this repository.
+
+The chapter is unusual in what it gives a reader to check. It has no tables, prints no estimates, and states no standard errors, so most of its checkable content is qualitative: a direction, an ordering, a stated range, an axis label. Those rows carry a predicate evaluated against the pipeline output rather than a verdict typed by hand, so that a claim like "the ATE estimate is large and negative" is settled by asking whether the interval excludes zero rather than by an author's judgement about what counts as large.
+
+```{r gt_table}
+gt |>
+  mutate(across(everything(), \(x) replace_na(as.character(x), ""))) |>
+  select(table_figure, claim, value_paper, value_script, match) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Location", "Claim", "Chapter", "Archive data", "Match"),
+    caption = "Ground truth: what the chapter states against what the deposited data and scripts produce. A blank Match means the chapter does not state the quantity."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "repeat_header"), font_size = 6) |>
+    column_spec(2, width = "5cm") |>
+    column_spec(3, width = "2.5cm") |>
+    column_spec(4, width = "2.5cm"))
+```
+
+Of the `r n_claims` recorded claims, `r n_verifiable` state something the chapter can be held to. `r n_match` hold and `r n_fail` do not. Every one of the eight published figures carries at least one row.
+
+## The transposed neighborhoods
+
+The chapter's discussion of Figure 17.3 reads:
+
+> In Figure 17.3a, we facet by block. Within each facet, the groups that are compared are formed by random assignment: we see small effects of treatment in neighborhood 1 and large negative effects of treatment in neighborhood 2.
+
+```{r block_ate_table}
+read_csv(here::here("maintained", "output", "figure_3_blocked_block_ates.csv"),
+         show_col_types = FALSE) |>
+  transmute(
+    Neighborhood = neighborhood,
+    Residents = c(50, 100),
+    `Pr(treated)` = sprintf("%.2f", prob_treated),
+    Effect = sprintf("%.2f", estimate),
+    SE = sprintf("%.2f", std.error),
+    p = sprintf("%.3f", p.value)
+  ) |>
+  kable(
+    booktabs = TRUE,
+    caption = "Block-level treatment effects in the deposited blocked dataset."
+  ) |>
+  latex_only(\(k) k |> kable_styling(latex_options = "hold_position", font_size = 9))
+```
+
+The large negative effect is in neighborhood 1 and the small one is in neighborhood 2. Three independent sources agree: the deposited dataset, the deposited generator, whose potential outcomes are written `-4 * Z * (neighborhood == 1)`, and the published figure itself, whose left facet is labelled "Neighborhood 1" and shows a drop from 10.5 to 6.2. Only the sentence on the facing page has them the other way round. Nothing in the code needs changing and the maintained rewrite reproduces the figure as published; the error is in the prose.
+
+## The 400 to 1600 point scale
+
+The clustered example describes an outcome "measured on a 400-1600-point scale", and both panels of Figure 17.4 set their limits accordingly. The simulated outcomes run from 217 to 1720, so eight of the 441 students sit outside the stated scale and are clipped out of the figure by `coord_cartesian()`. The design draws a classroom shock at `rnorm(30, 1000, 100)` and a student shock at `rnorm(n, sd = 175)`, which puts about two percent of the distribution outside the range on arithmetic alone. The clipping is the chapter's own choice and the rewrite keeps it; the mismatch is between the data and the sentence that describes them.
+
+## The relabelled panel
+
+`clustered.R` gives both panels the y-axis label `Outcome variable: Classroom Average SAT score`. Panel (b) plots students rather than classes, and the published panel (b) is labelled `Outcome variable: SAT score`. The book restyled every axis label in the chapter to sentence case, so some difference was expected; what makes this one substantive is that the restyling also dropped "classroom average", which is a correction rather than a matter of house style. The published figure is the better one and the deposited code does not produce it. This is the only place in the archive where running the deposited script yields a figure that differs from the published one in something other than jitter.
+
+# Maintained rewrite
+
+The rewrite lives in `maintained/`: seven figure scripts, two scripts for quantities that belong to no single figure, a port of the data generator, and a shared `helpers.R`. It is a translation, not a reanalysis: every estimator and every plotted quantity is the one the chapter used.
+
+```{r scripts_table}
+tibble(
+  Script = c(
+    "figure_1_two_arm_trial.R",
+    "figure_2_blocked_experiment.R",
+    "figure_4_clustered_experiment.R",
+    "figure_5_covariate_adjustment.R",
+    "figure_6_interaction_continuous.R",
+    "figure_7_noncompliance.R",
+    "figure_8_attrition.R",
+    "text_design_parameters.R",
+    "text_stata_equivalent.R",
+    "text_archive_agreement.R",
+    "make_datasets.R"
+  ),
+  Produces = c(
+    "Figure 17.1, both panels",
+    "Figures 17.2 and 17.3, four panels from one dataset",
+    "Figure 17.4, both panels",
+    "Figure 17.5",
+    "Figure 17.6, both panels",
+    "Figure 17.7, both panels",
+    "Figure 17.8",
+    "The design facts the chapter states in prose",
+    "The deposited Stata file's estimator, in R, against the R script's",
+    "Every figure's estimates re-derived from the deposit, against the rewrite's",
+    "The seven simulated datasets, regenerated under the current DeclareDesign API"
+  )
+) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Script", "Produces"),
+    caption = "Maintained rewrite scripts."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "scale_down"), font_size = 8) |>
+    column_spec(1, width = "5.5cm") |>
+    column_spec(2, width = "7cm"))
+```
+
+Every figure script also writes the estimates it plots to a CSV, along with the axis labels and panel ranges the chapter makes claims about. The chapter prints no numbers, so an output folder of images alone would make the reproduction diff a formality: a PDF differs on every run because it records the time it was written. Writing the plotted quantities out is what makes `git diff` on `maintained/output/` a check rather than a ritual.
+
+## Deprecated patterns replaced
+
+```{r replacements_table}
+tibble(
+  Original = c(
+    "`rm(list = ls())`",
+    "`library()` in each analysis script",
+    "relative paths to the working directory",
+    "`do(tidy(lm_robust(..., data = .)))`",
+    "`gather()` / `spread()`",
+    "`geom_errorbar(width = 0)`",
+    "`data.frame()` for small hand-built frames",
+    "`summary() |> as.data.frame()`",
+    "`declare_population()` / `declare_assignment(m = )`",
+    "figures written into the archive directory",
+    "magrittr pipe"
+  ),
+  Replacement = c(
+    "(omitted)",
+    "`source(here::here(\"maintained\", \"helpers.R\"))`",
+    "`here::here()`",
+    "`reframe(tidy(lm_robust(..., data = pick(everything()))))`",
+    "`pivot_longer()` / `pivot_wider()`",
+    "`geom_linerange()`",
+    "`tibble()`",
+    "`as_tibble()`",
+    "`declare_model()` / `declare_assignment(Z = complete_ra(...))`",
+    "`ggsave()` to `maintained/output/`",
+    "native pipe"
+  )
+) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Original pattern", "Replacement"),
+    caption = "Deprecated patterns and their replacements in the maintained rewrite."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "scale_down"), font_size = 8) |>
+    column_spec(1, width = "6cm") |>
+    column_spec(2, width = "6.5cm"))
+```
+
+One substantive correction was made. The archive's `interaction.R` writes `geom_errorbar(aes(ymax = lower, ymin = upper), width = 0)` with the bounds transposed. Because `width = 0` draws a bare segment with no caps, the transposition is invisible in the output, and the rewrite writes them the right way round. No published value changes.
+
+## Three things left alone
+
+The `coord_cartesian()` limits that clip eight clustered observations are the chapter's, and they are kept. Widening them would produce a figure the book does not contain.
+
+`figure_5_covariate_adjustment.R` residualises with `lm()` and then plots, exactly as the deposit does, rather than reading the coefficients off `lm_lin()`. The archive prints three estimators side by side under the comment "standard errors v. slightly off; point estimates OK", and the rewrite writes those three out instead of printing them into a console that no longer exists. Both halves of the comment hold: the point estimates agree to fifteen digits at 1.9796, which is what the chapter says they should do, and the standard errors are 0.09486 against 0.09398.
+
+The unseeded `position_jitter()` calls are seeded at 42. That moves the point clouds slightly relative to the published figures and is the only respect in which any panel differs from the book beyond the axis label discussed above. Seeding a jitter changes an irreproducible figure into a reproducible one; it does not change what the figure shows.
+
+# The rewrite against the archive
+
+The chapter states no estimates, so a claim that the rewrite reproduces the archive cannot rest on comparing published numbers. `text_archive_agreement.R` settles it directly: it re-derives every estimate behind the eight figures from the deposited data, using the model specifications the deposited scripts use, and compares the result against what the figure scripts wrote. The reshaping and labelling deliberately differ from the deposit, because that is where a faithful-looking port goes wrong; the model calls do not.
+
+```{r agreement_table}
+archive_agreement |>
+  transmute(
+    Figure = figure,
+    Quantity = quantity,
+    Values = n_values,
+    `Largest absolute difference` = format(max_abs_difference, scientific = TRUE, digits = 3)
+  ) |>
+  kable(booktabs = TRUE,
+        caption = "The rewrite's plotted estimates against the same quantities re-derived from the deposit.") |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "scale_down"), font_size = 8) |>
+    column_spec(2, width = "6cm"))
+```
+
+All `r n_agreement_values` values agree to within `r format(max_agreement_gap, scientific = TRUE, digits = 2)`, which is floating point noise. The deposited scripts' own `do(tidy(...))` idiom returns the same numbers. The ground truth builder asserts this agreement and stops if it ever fails, which is why its archive and rewrite columns carry the same value.
+
+# The data generator under the current API
+
+`maintained/make_datasets.R` declares the same seven designs using `declare_model()` and the current assignment functions, seeds at 343 as the archive does, and compares every regenerated column against the deposited file.
+
+```{r generator_table}
+generator_comparison |>
+  group_by(dataset) |>
+  summarise(
+    columns = n(),
+    agree = sum(agrees),
+    differ = paste(column[!agrees], collapse = ", "),
+    .groups = "drop"
+  ) |>
+  mutate(differ = if_else(differ == "", "none", differ)) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Dataset", "Columns", "Identical", "Columns that differ"),
+    caption = "The current-API port against the deposited simulated data."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = "hold_position", font_size = 8) |>
+    column_spec(4, width = "5cm"))
+```
+
+`r n_generator_agree` of the `r n_generator_total` regenerated columns come back identical to the deposit. Every fabricated covariate and every potential outcome reproduces, in all seven datasets. What differs is the realised assignment vector in four of them, and the columns revealed through it. The pattern is specific: `complete_ra(N, m = 100)` and `block_ra(blocks, m = 25)` return the assignments the deposit records, while `complete_ra(N)` with no `m` and `cluster_ra(clusters)` do not. The drift is in `randomizr`, not in R's sampler. Running the repaired generator under `RNGkind(sample.kind = "Rounding")`, which restores the pre-3.6 `sample()`, makes matters worse rather than better: the blocked dataset stops reproducing too. Since the analysis scripts read the deposited files rather than these, no published figure depends on the difference.
+
+Two details of the port are worth recording because they are the reason it reproduces anything at all.
+
+The reveal steps use `declare_reveal()` rather than `declare_measurement()` with `reveal_outcomes()`. The two are equivalent here, but the second draws two extra random numbers per design, which moves every design after the first off the archive's random number stream and makes the comparison above uniformly negative for reasons that have nothing to do with the deposit.
+
+The generator's blocked section prints two regressions before moving on, and the inverse-probability-weighted one draws two random numbers on its way through `estimatr`. Those draws sit in the stream between the blocked design and every design declared after it, so the deposited data depend on a diagnostic call that computes nothing the file needs. The port keeps the pair and writes their output out rather than printing it. This is a real property of the deposit worth stating plainly: five of its seven datasets cannot be regenerated by any script that tidies away a dead `print()`.
+
+# Figure verification
+
+```{r figure_grid_blocked, out.width="100%", fig.cap="Figures 17.2 and 17.3 as reproduced by the maintained rewrite: the blocked experiment weighted and unweighted, then faceted by block and by condition."}
+knitr::include_graphics(
+  if (latex_out) {
+    c(here::here("maintained", "output", "figure_2_blocked_good.pdf"),
+      here::here("maintained", "output", "figure_3_blocked_facets_good.pdf"))
+  } else {
+    c("maintained/output/figure_2_blocked_good.png",
+      "maintained/output/figure_3_blocked_facets_good.png")
+  }
+)
+```
+
+```{r figure_grid_clustered, out.width="100%", fig.cap="Figure 17.4 as reproduced by the maintained rewrite: cluster means with cluster-robust intervals, then students with intervals that ignore the clustering. Both carry the deposited script's axis label; the published panel (b) does not."}
+knitr::include_graphics(
+  if (latex_out) {
+    c(here::here("maintained", "output", "figure_4_clustered_good.pdf"),
+      here::here("maintained", "output", "figure_4_clustered_bad.pdf"))
+  } else {
+    c("maintained/output/figure_4_clustered_good.png",
+      "maintained/output/figure_4_clustered_bad.png")
+  }
+)
+```
+
+All fourteen panels reproduce the published figures. Beyond the seeded jitter and the Figure 17.4 axis label, no panel differs from its published counterpart.
+
+```{r design_table}
+design_parameters |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Figure", "Quantity", "Value in the deposited data"),
+    caption = "Design parameters read off the deposited datasets by the in-text script."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "repeat_header"), font_size = 8) |>
+    column_spec(2, width = "6cm"))
+```
+
+# Maintained rewrite verification
+
+```{r rewrite_verify}
+gt |>
+  mutate(across(everything(), \(x) replace_na(as.character(x), ""))) |>
+  select(table_figure, claim, value_paper, value_rewrite, match_rewrite, defect_locus) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Location", "Claim", "Chapter", "Rewrite", "Match", "Locus"),
+    caption = "Maintained rewrite verification: what the chapter states against what the rewrite produces."
+  ) |>
+  latex_only(\(k) k |>
+    kable_styling(latex_options = c("hold_position", "repeat_header"), font_size = 6) |>
+    column_spec(2, width = "4.5cm") |>
+    column_spec(3, width = "2.3cm") |>
+    column_spec(4, width = "2.3cm"))
+```
+
+The rewrite and the deposited data give the same answer to every claim, which they should: both read the same seven deposited CSV files, and the previous section measures how closely. Two of the three failures sit in the chapter's prose and no rewrite of the code can repair them; the third sits in the deposited script, where the published figure carries a label the code does not produce.
+
+# R environment
+
+```{r env}
+si <- sessionInfo()
+tibble(
+  Item = c("R version", "Platform", "Date run"),
+  Value = c(
+    paste(si$R.version$major, si$R.version$minor, sep = "."),
+    si$platform,
+    format(Sys.Date())
+  )
+) |>
+  kable(booktabs = TRUE) |>
+  latex_only(\(k) k |> kable_styling(latex_options = "hold_position"))
+```
+
+```{r env_pkgs}
+pkgs <- c("tidyverse", "dplyr", "ggplot2", "tidyr", "estimatr", "broom",
+          "margins", "DeclareDesign", "randomizr", "fabricatr", "here")
+tibble(
+  Package = pkgs,
+  Version = map_chr(pkgs, \(p) as.character(packageVersion(p)))
+) |>
+  kable(booktabs = TRUE, caption = "Package versions used for the run behind this report.") |>
+  latex_only(\(k) k |> kable_styling(latex_options = "hold_position"))
+```

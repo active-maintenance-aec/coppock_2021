@@ -1,0 +1,9 @@
+figure,quantity,n_values,max_abs_difference
+Figure 17.1,Group means and intervals,8,5.551115123125783e-17
+Figure 17.2,Weighted and unweighted group means,16,5.551115123125783e-17
+Figure 17.3,Group means within each facet,32,0
+Figure 17.4,Clustered and unclustered group means,16,2.2737367544323206e-13
+Figure 17.5,Three covariate adjustment estimators,12,2.220446049250313e-16
+Figure 17.6,CATE across the covariate grid,51,4.440892098500626e-16
+Figure 17.7,Group means by assigned group,16,2.7755575615628914e-17
+Figure 17.8,Bounded group means,16,4.440892098500626e-16

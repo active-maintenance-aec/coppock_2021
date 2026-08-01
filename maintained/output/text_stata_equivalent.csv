@@ -1,0 +1,5 @@
+condition,estimate,std.error,conf.low,conf.high,method
+Control,0.515,0.025020042091604567,0.46581241630702525,0.5641875836929748,"R script: lm_robust HC2, t distribution"
+Control,0.5149999999999999,0.025020042091604577,0.4659607175004549,0.5640392824995448,"Stata .do file: sd / sqrt(N), normal approximation"
+Treatment,0.61,0.049020713000019735,0.5127322702865081,0.7072677297134918,"R script: lm_robust HC2, t distribution"
+Treatment,0.6100000000000001,0.049020713000019756,0.5139194025199614,0.7060805974800388,"Stata .do file: sd / sqrt(N), normal approximation"
