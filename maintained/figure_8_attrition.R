@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_8_attrition.R
+# coppock_2021/maintained/figure_8_attrition.R
 # Output: output/figure_8_attrition_good.pdf/.png, output/figure_8_attrition_estimates.csv
 # Depends on: original/replication_archive/attrition_simulated_data.csv, helpers.R
 # Description: Figure 17.8, extreme value bounds under attrition, with the imputed

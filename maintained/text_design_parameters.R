@@ -1,4 +1,4 @@
-# coppock_2020/maintained/text_design_parameters.R
+# coppock_2021/maintained/text_design_parameters.R
 # Output: output/text_design_parameters.csv
 # Depends on: original/replication_archive/*_simulated_data.csv, helpers.R
 # Description: The design facts the chapter states in prose (sample sizes, numbers

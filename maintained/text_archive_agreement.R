@@ -1,4 +1,4 @@
-# coppock_2020/maintained/text_archive_agreement.R
+# coppock_2021/maintained/text_archive_agreement.R
 # Output: output/text_archive_agreement.csv
 # Depends on: original/replication_archive/*_simulated_data.csv, all seven figure
 #   scripts, helpers.R

@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_5_covariate_adjustment.R
+# coppock_2021/maintained/figure_5_covariate_adjustment.R
 # Output: output/figure_5_covariate_adjustment_good.pdf/.png,
 #         output/figure_5_covariate_adjustment_estimators.csv,
 #         output/figure_5_covariate_adjustment_panel_ranges.csv

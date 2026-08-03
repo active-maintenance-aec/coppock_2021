@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_7_noncompliance.R
+# coppock_2021/maintained/figure_7_noncompliance.R
 # Output: output/figure_7_noncompliance_good.pdf/.png, output/figure_7_noncompliance_bad.pdf/.png,
 #         output/figure_7_noncompliance_estimates.csv
 # Depends on: original/replication_archive/noncompliance_simulated_data.csv, helpers.R

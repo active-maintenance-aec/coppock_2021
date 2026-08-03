@@ -1,4 +1,4 @@
-# coppock_2020/maintained/make_datasets.R
+# coppock_2021/maintained/make_datasets.R
 # Output: output/simulated_data/*.csv, output/make_datasets_deposit_comparison.csv,
 #         output/make_datasets_blocked_diagnostics.csv
 # Depends on: original/replication_archive/*_simulated_data.csv, helpers.R

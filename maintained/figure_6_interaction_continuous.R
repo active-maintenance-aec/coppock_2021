@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_6_interaction_continuous.R
+# coppock_2021/maintained/figure_6_interaction_continuous.R
 # Output: output/figure_6_interactions_good.pdf/.png, output/figure_6_interactions_bad.pdf/.png,
 #         output/figure_6_interaction_fit.csv, output/figure_6_interaction_cates.csv,
 #         output/figure_6_interaction_binned_residuals.csv

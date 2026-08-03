@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_2_blocked_experiment.R
+# coppock_2021/maintained/figure_2_blocked_experiment.R
 # Output: output/figure_2_blocked_good.pdf/.png, output/figure_2_blocked_bad.pdf/.png,
 #         output/figure_3_blocked_facets_good.pdf/.png,
 #         output/figure_3_blocked_facets_bad.pdf/.png,

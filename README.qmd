@@ -1,12 +1,12 @@
 ---
-title: "Reproducibility Report: Coppock (2020)"
+title: "Reproducibility Report: Coppock (2021)"
 subtitle: "Visualize as You Randomize: Design-Based Statistical Graphs for Randomized Experiments"
 format:
   gfm:
     output-file: README.md
     toc: true
   pdf:
-    output-file: coppock_2020_report.pdf
+    output-file: coppock_2021_report.pdf
     toc: true
     toc-depth: 2
     number-sections: true
@@ -30,7 +30,7 @@ latex_out <- knitr::is_latex_output()
 
 latex_only <- function(k, f) if (latex_out) f(k) else k
 
-gt <- read_csv(here::here("ground_truth", "coppock_2020_ground_truth.csv"),
+gt <- read_csv(here::here("ground_truth", "coppock_2021_ground_truth.csv"),
                show_col_types = FALSE)
 
 design_parameters <- read_csv(here::here("maintained", "output", "text_design_parameters.csv"),
@@ -54,7 +54,7 @@ stata_comparison <- read_csv(
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
 
-This repository holds the actively maintained replication code for Coppock (2020), together with the reproducibility report that documents what the original archive did and did not do. It is part of a program applying the maintenance proposal in Peer, Orr and Coppock (2021, *PS: Political Science & Politics*, doi [10.1017/S1049096521000366](https://doi.org/10.1017/S1049096521000366)) to a set of published archives.
+This repository holds the actively maintained replication code for Coppock (2021), together with the reproducibility report that documents what the original archive did and did not do. It is part of a program applying the maintenance proposal in Peer, Orr and Coppock (2021, *PS: Political Science & Politics*, doi [10.1017/S1049096521000366](https://doi.org/10.1017/S1049096521000366)) to a set of published archives.
 
 | | |
 |---|---|
@@ -68,7 +68,7 @@ This repository holds the actively maintained replication code for Coppock (2020
 
 **License.** CC0 1.0 Universal, matching the terms of the deposit this repository maintains, so nothing in the chain is more restrictive than the archive itself. See `LICENSE`.
 
-**To reproduce.** Clone or download the repository, open `coppock_2020.Rproj`, and run:
+**To reproduce.** Clone or download the repository, open `coppock_2021.Rproj`, and run:
 
 ``` r
 source("run_all.R")
@@ -125,7 +125,7 @@ The three failures are worth naming. The chapter says the blocked experiment sho
 
 # Chapter overview
 
-**Citation**: Coppock, A. (2020). "Visualize as you randomize: Design-based statistical graphs for randomized experiments." In J. N. Druckman and D. P. Green (eds.), *Advances in Experimental Political Science*, 320-336. Cambridge University Press. DOI: 10.1017/9781108777919.022. Crossref dates the volume to April 2021; this program indexes the chapter as 2020, following the author's own catalogue.
+**Citation**: Coppock, A. (2021). "Visualize as you randomize: Design-based statistical graphs for randomized experiments." In J. N. Druckman and D. P. Green (eds.), *Advances in Experimental Political Science*, 320-336. Cambridge University Press. DOI: 10.1017/9781108777919.022, dated by Crossref to April 2021.
 
 **Summary**: A methods chapter arguing that a graph of an experiment should encode the design as well as the result. Two design principles do the work: invite visual comparisons across randomly formed groups rather than across groups formed before or after treatment, and show the fitted model and its uncertainty in data space rather than on its own. A third asks that design features like blocking, clustering and differential assignment probabilities be mapped to visual cues. The chapter works through seven designs, each with a panel that follows the advice and a panel that does not: a two-arm trial, a blocked experiment, the same blocked experiment faceted two ways, a cluster-randomized trial, covariate adjustment shown as a residual-on-residual plot, an interaction with a continuous covariate, two-sided noncompliance, and attrition with extreme value bounds. All of the data are simulated, so the chapter reports no estimates and prints no tables. Its empirical content is the figures themselves and the design parameters it states in prose.
 

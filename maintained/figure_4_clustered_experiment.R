@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_4_clustered_experiment.R
+# coppock_2021/maintained/figure_4_clustered_experiment.R
 # Output: output/figure_4_clustered_good.pdf/.png, output/figure_4_clustered_bad.pdf/.png,
 #         output/figure_4_clustered_estimates.csv, output/figure_4_clustered_ates.csv,
 #         output/figure_4_clustered_axis_labels.csv

@@ -1,4 +1,4 @@
-# coppock_2020/maintained/figure_1_two_arm_trial.R
+# coppock_2021/maintained/figure_1_two_arm_trial.R
 # Output: output/figure_1_two_arm_good.pdf/.png, output/figure_1_two_arm_bad.pdf/.png,
 #         output/figure_1_two_arm_estimates.csv
 # Depends on: original/replication_archive/two_arm_simulated_data.csv, helpers.R

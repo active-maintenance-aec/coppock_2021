@@ -1,5 +1,5 @@
-# coppock_2020/ground_truth/build_ground_truth.R
-# Output: ground_truth/coppock_2020_ground_truth.csv
+# coppock_2021/ground_truth/build_ground_truth.R
+# Output: ground_truth/coppock_2021_ground_truth.csv
 # Depends on: maintained/output/ (run run_all.R first)
 # Description: Assemble the ground truth table. Every value_paper entry was read off
 #   the published chapter and is used only as a comparison target; no published value
@@ -329,7 +329,7 @@ gt <- tribble(
 # columns carry the same value and the two match verdicts are the same verdict.
 gt <- gt |>
   mutate(
-    paper_id = "coppock_2020",
+    paper_id = "coppock_2021",
     value_rewrite = value_script,
     match_rewrite = match,
     defect_locus = if_else(match_rewrite == 0 & defect_locus == "", "unresolved", defect_locus),
@@ -340,7 +340,7 @@ gt <- gt |>
 
 stopifnot(all(gt$defect_locus[!is.na(gt$match_rewrite) & gt$match_rewrite == 0] != ""))
 
-write_csv(gt, here::here("ground_truth", "coppock_2020_ground_truth.csv"))
+write_csv(gt, here::here("ground_truth", "coppock_2021_ground_truth.csv"))
 
 print(gt |> select(table_figure, claim, value_script, value_paper, match), n = nrow(gt), width = 200)
 print(str_glue("rows: {nrow(gt)}  match=1: {sum(gt$match == 1, na.rm = TRUE)}  ",

@@ -1,4 +1,4 @@
-# coppock_2020/maintained/text_stata_equivalent.R
+# coppock_2021/maintained/text_stata_equivalent.R
 # Output: output/text_stata_equivalent.csv
 # Depends on: original/replication_archive/two_arm_simulated_data.csv, helpers.R
 # Description: The deposit's README says its Stata file "produces something similar

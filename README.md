@@ -1,4 +1,4 @@
-# Reproducibility Report: Coppock (2020)
+# Reproducibility Report: Coppock (2021)
 
 
 - [Summary](#summary)
@@ -26,7 +26,7 @@
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
 
 This repository holds the actively maintained replication code for
-Coppock (2020), together with the reproducibility report that documents
+Coppock (2021), together with the reproducibility report that documents
 what the original archive did and did not do. It is part of a program
 applying the maintenance proposal in Peer, Orr and Coppock (2021, *PS:
 Political Science & Politics*, doi
@@ -65,7 +65,7 @@ repository maintains, so nothing in the chain is more restrictive than
 the archive itself. See `LICENSE`.
 
 **To reproduce.** Clone or download the repository, open
-`coppock_2020.Rproj`, and run:
+`coppock_2021.Rproj`, and run:
 
 ``` r
 source("run_all.R")
@@ -149,13 +149,11 @@ between the deposit and the book.
 
 # Chapter overview
 
-**Citation**: Coppock, A. (2020). “Visualize as you randomize:
+**Citation**: Coppock, A. (2021). “Visualize as you randomize:
 Design-based statistical graphs for randomized experiments.” In J. N.
 Druckman and D. P. Green (eds.), *Advances in Experimental Political
 Science*, 320-336. Cambridge University Press. DOI:
-10.1017/9781108777919.022. Crossref dates the volume to April 2021; this
-program indexes the chapter as 2020, following the author’s own
-catalogue.
+10.1017/9781108777919.022, dated by Crossref to April 2021.
 
 **Summary**: A methods chapter arguing that a graph of an experiment
 should encode the design as well as the result. Two design principles do
@@ -644,7 +642,7 @@ label the code does not produce.
 |:----------|:-----------------------|
 | R version | 4.6.0                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-08-01             |
+| Date run  | 2026-08-03             |
 
 | Package       | Version |
 |:--------------|:--------|
