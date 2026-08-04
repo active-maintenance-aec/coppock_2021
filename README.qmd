@@ -30,11 +30,35 @@ latex_out <- knitr::is_latex_output()
 
 latex_only <- function(k, f) if (latex_out) f(k) else k
 
+# value_paper carries the string the chapter prints, so it is read as a character
+# column everywhere: guessed as a double it would turn 0.80 into 0.8 and print the
+# chapter back to the reader at a precision the chapter never used.
 gt <- read_csv(here::here("ground_truth", "coppock_2021_ground_truth.csv"),
-               show_col_types = FALSE)
+               col_types = cols(value_paper = col_character(), .default = col_guess()))
+
+published_claims <- read_csv(here::here("ground_truth", "published_claims.csv"),
+                             col_types = cols(value_paper = col_character(),
+                                              .default = col_guess()))
 
 design_parameters <- read_csv(here::here("maintained", "output", "text_design_parameters.csv"),
                               show_col_types = FALSE)
+
+descriptive_claims <- read_csv(here::here("maintained", "output", "text_descriptive_claims.csv"),
+                               show_col_types = FALSE)
+
+param <- function(fig, q) {
+  v <- design_parameters$value[design_parameters$figure == fig &
+                                 design_parameters$quantity == q]
+  stopifnot(length(v) == 1)
+  v
+}
+
+target <- function(fig, q) {
+  v <- descriptive_claims$value[descriptive_claims$figure == fig &
+                                  descriptive_claims$quantity == q]
+  stopifnot(length(v) == 1)
+  v
+}
 
 generator_comparison <- read_csv(
   here::here("maintained", "output", "make_datasets_deposit_comparison.csv"),
@@ -50,6 +74,26 @@ stata_comparison <- read_csv(
   here::here("maintained", "output", "text_stata_equivalent.csv"),
   show_col_types = FALSE
 )
+
+facet_estimates <- read_csv(
+  here::here("maintained", "output", "figure_3_blocked_facets_estimates.csv"),
+  show_col_types = FALSE
+)
+
+# Small counts are spelled out in prose, and a count that is computed has to be
+# spelled out by something rather than typed.
+spell <- function(n) {
+  words <- c("one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten")
+  if (n >= 1 && n <= 10) words[n] else as.character(n)
+}
+
+block_mean <- function(n, cond) {
+  v <- facet_estimates$estimate[facet_estimates$panel == "Faceted by block" &
+                                  facet_estimates$block == paste("Neighborhood", n) &
+                                  facet_estimates$condition == cond]
+  stopifnot(length(v) == 1)
+  sprintf("%.1f", v)
+}
 ```
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
@@ -64,7 +108,7 @@ This repository holds the actively maintained replication code for Coppock (2021
 
 **The data are not redistributed here.** The deposit is 280 KB across 17 files and lives at Harvard Dataverse, which is the only copy this repository points at. `download_original.R` fetches it and verifies every file; `original_manifest.csv` pins the Dataverse file identifiers, the UNF of each ingested data file, the deposit's own directory layout, and two checksums per file: the MD5 of the bytes Dataverse serves for `?format=original`, which is what this code was written against, and the MD5 Dataverse publishes. Here the two agree for all seventeen. They do not always, so the script verifies against the served bytes and reports any disagreement. Either way the exact bytes are pinned in version control even though the bytes themselves are not.
 
-**Repository layout.** `maintained/` is the maintained rewrite: one script per published figure, writing to `output/`, which is committed so a reader can compare a fresh run against it without downloading anything. `ground_truth/` ties every claim the chapter makes about its figures to the code that produces it, and is itself built by a script rather than typed. `original/` is created by the download script and is deliberately absent from the repository. This file is the reproducibility report, also available as a PDF in `report/`.
+**Repository layout.** `maintained/` is the maintained rewrite: one script per published figure, writing to `output/`, which is committed so a reader can compare a fresh run against it without downloading anything. `ground_truth/` ties every claim the chapter makes about its figures to the code that produces it, and is itself built by a script rather than typed; `ground_truth/published_claims.csv` is the extraction, a hand-reviewed inventory of every number and counted quantity in the chapter. `maintained/in_text_claims.R` recomputes each of those the pipeline can reach and prints it beside the sentence that states it. `coppock_2021_errata.pdf` lists the sentences and labels in the chapter that the deposited data do not support. `original/` is created by the download script and is deliberately absent from the repository. This file is the reproducibility report, also available as a PDF in `report/`.
 
 **License.** CC0 1.0 Universal, matching the terms of the deposit this repository maintains, so nothing in the chain is more restrictive than the archive itself. See `LICENSE`.
 
@@ -74,18 +118,25 @@ This repository holds the actively maintained replication code for Coppock (2021
 source("run_all.R")
 ```
 
-That fetches the deposit, verifies its seventeen checksums, produces every figure into `maintained/output/`, and rebuilds the ground truth table from those outputs. It takes about ten seconds. Required packages: tidyverse, estimatr, broom, margins, DeclareDesign, knitr, kableExtra, here. Paths resolve through `here`, so nothing depends on the working directory and the scripts work equally well under `Rscript` outside RStudio. Individual scripts can be run on their own in any order, with two exceptions: `text_archive_agreement.R` reads the figure scripts' output and `build_ground_truth.R` reads everything, so both come last.
+That fetches the deposit, verifies its seventeen checksums, produces every figure into `maintained/output/`, rebuilds the ground truth table from those outputs, runs the coverage gate over the claims file, and prints the claim-by-claim audit trail. It takes about ten seconds. Required packages: tidyverse, estimatr, broom, margins, DeclareDesign, knitr, kableExtra, here. Paths resolve through `here`, so nothing depends on the working directory and the scripts work equally well under `Rscript` outside RStudio. Individual scripts can be run on their own in any order, with two exceptions: `text_archive_agreement.R` reads the figure scripts' output and `build_ground_truth.R` reads everything, so both come last.
 
 A successful run overwrites `maintained/output/`, which is committed: **`git diff` on that folder is the reproduction check**, and the CSV and PNG output should come back byte-identical. The fourteen PDF figures always show as changed, because a PDF records the time it was written; compare their PNG twins instead.
 
 # Summary
 
 ```{r summary_setup}
+# A claim about a value carries its verdict in `match`; a claim about shape, sign or
+# ordering has no value to compare and carries its verdict in `holds`. Neither is a
+# typed judgement: both are predicates the build script evaluates.
+verdict <- coalesce(gt$match, gt$holds)
 n_claims <- nrow(gt)
-n_verifiable <- sum(!is.na(gt$match))
-n_match <- sum(gt$match == 1, na.rm = TRUE)
-n_fail <- sum(gt$match == 0, na.rm = TRUE)
-n_unverifiable <- sum(is.na(gt$match))
+n_verifiable <- sum(!is.na(verdict))
+n_match <- sum(verdict == 1, na.rm = TRUE)
+n_fail <- sum(verdict == 0, na.rm = TRUE)
+n_unverifiable <- sum(is.na(verdict))
+n_extraction <- nrow(published_claims)
+n_blocks <- sum(published_claims$needs_block)
+n_paper_internal <- sum(gt$defect_locus == "paper_internal", na.rm = TRUE)
 n_generator_agree <- sum(generator_comparison$agrees)
 n_generator_total <- nrow(generator_comparison)
 max_agreement_gap <- max(archive_agreement$max_abs_difference)
@@ -102,16 +153,24 @@ The eighth script is the data generator, and it fails for three separate reasons
 
 ## Does the maintained rewrite reproduce the chapter?
 
-Yes for the figures, with three exceptions, two of which belong to the chapter rather than to the code. Of `r n_claims` recorded claims, `r n_verifiable` can be checked against the published chapter; `r n_match` match and `r n_fail` do not. The `r n_unverifiable` remaining are quantities the chapter never states, which is a large share, because this is a methods chapter with no tables and no reported estimates: its figures are drawn from simulated data and its claims are about shape and direction rather than magnitude.
+Every figure reproduces. What does not is a handful of claims the chapter makes about those figures, most of which belong to the chapter rather than to the code. Of `r n_claims` recorded claims, `r n_verifiable` can be checked against the published chapter; `r n_match` hold and `r n_fail` do not, `r spell(n_paper_internal)` of the latter being sentences or labels the chapter's own data contradict. The `r n_unverifiable` remaining are quantities the chapter never states, which is a large share, because this is a methods chapter with no tables and no reported estimates: its figures are drawn from simulated data and its claims are about shape and direction rather than magnitude. The `r spell(n_paper_internal)` that are the chapter's own are collected in `coppock_2021_errata.pdf` at the root of this repository; none of them changes a conclusion.
 
 ```{r summary_table}
 tibble::tribble(
   ~Component, ~Verdict,
-  "Figures 17.1, 17.2, 17.5, 17.6, 17.7, 17.8", "Reproduce",
-  "Figure 17.3 (blocked, faceted by block)", "Figure reproduces; the text describing it transposes the two neighborhoods",
+  "Figures 17.1, 17.2, 17.6, 17.7, 17.8", "Reproduce",
+  "Figure 17.3 (blocked, faceted by block)", "Figure reproduces; the text describing it transposes the two neighborhoods, and calls the blocks schools",
+  "Figure 17.3, panel (b) axis labels", "The deposited script abbreviates where the published panel spells out",
   "Figure 17.4 (clustered), estimates", "Reproduce",
-  "Figure 17.4 (clustered), stated outcome scale", "Eight of 441 outcomes fall outside the stated 400 to 1600 range",
+  "Figure 17.4 (clustered), stated outcome scale",
+  paste0(target("Figure 17.4", "Students with an outcome outside the stated 400 to 1600 scale"),
+         " of ", target("Figure 17.4", "Students in total"),
+         " outcomes fall outside the stated 400 to 1600 range"),
   "Figure 17.4 (clustered), panel (b) axis label", "The deposited script does not produce the published label",
+  "Figure 17.5 (covariate adjustment), estimates", "Reproduce",
+  "Figure 17.5, vertical axis label",
+  paste0("Describes a seven-point Likert raw scale; the outcome takes ",
+         param("Figure 17.5", "Number of distinct outcome values"), " distinct values"),
   "Data generator (seven simulated datasets)", paste0(n_generator_agree, " of ", n_generator_total, " columns regenerate identically")
 ) |>
   kable(booktabs = TRUE, caption = "Reproduction verdict by component.") |>
@@ -121,7 +180,9 @@ tibble::tribble(
     column_spec(2, width = "7cm"))
 ```
 
-The three failures are worth naming. The chapter says the blocked experiment shows "small effects of treatment in neighborhood 1 and large negative effects of treatment in neighborhood 2"; the two neighborhoods are the other way round, in the deposited data, in the deposited generator, and in the published figure. The chapter says the clustered outcome is "measured on a 400-1600-point scale"; eight of the 441 simulated outcomes fall outside it and both panels clip. And the deposited code labels both panels of Figure 17.4 as classroom averages, while the published panel (b), which plots students, is labelled "Outcome variable: SAT score", so that label was corrected somewhere between the deposit and the book.
+All `r spell(n_fail)` failures are worth naming, and `r spell(n_paper_internal)` of them are the chapter's own. It says the blocked experiment shows "small effects of treatment in neighborhood 1 and large negative effects of treatment in neighborhood 2"; the two neighborhoods are the other way round, in the deposited data, in the deposited generator, and in the published figure. In the next sentence it says Figure 17.3b compares "across schools", of a design with `r param("Figures 17.2 and 17.3", "Number of neighborhoods")` neighborhoods and no schools. It says the clustered outcome is "measured on a 400-1600-point scale"; `r target("Figure 17.4", "Students with an outcome outside the stated 400 to 1600 scale")` of the `r target("Figure 17.4", "Students in total")` simulated outcomes fall outside it and both panels clip. And the vertical axis of Figure 17.5 calls its raw scale a seven-point Likert, where the outcome takes `r param("Figure 17.5", "Number of distinct outcome values")` distinct values across `r param("Figure 17.5", "N")` units.
+
+The remaining `r spell(n_fail - n_paper_internal)` are the deposit falling short of the book, in the same place and in the same direction both times: the deposited scripts label two panels less well than the published figures do. `clustered.R` labels both panels of Figure 17.4 as classroom averages, while the published panel (b), which plots students, is labelled "Outcome variable: SAT score". `blocked.R` abbreviates the horizontal axis of Figure 17.3b to "N/hood", while the published panel spells "Neighborhood" out. In both cases the published figure is the better one and running the deposited script does not produce it.
 
 # Chapter overview
 
@@ -221,16 +282,16 @@ The claim holds. The group means are identical, and the intervals differ only be
 
 The ground truth is built by `ground_truth/build_ground_truth.R`, which reads every archive and rewrite value out of `maintained/output/` and writes the table. Nothing in it is typed except the values read from the published chapter, and those are only ever comparison targets: no published number is an input to any computation in this repository.
 
-The chapter is unusual in what it gives a reader to check. It has no tables, prints no estimates, and states no standard errors, so most of its checkable content is qualitative: a direction, an ordering, a stated range, an axis label. Those rows carry a predicate evaluated against the pipeline output rather than a verdict typed by hand, so that a claim like "the ATE estimate is large and negative" is settled by asking whether the interval excludes zero rather than by an author's judgement about what counts as large.
+The chapter is unusual in what it gives a reader to check. It has no tables, prints no estimates, and states no standard errors, so most of its checkable content is qualitative: a direction, an ordering, a stated range, an axis label. A claim about a value carries its verdict in the `Match` column; a claim about shape, sign or ordering has no value to compare and carries its verdict in `Holds`. Neither is typed. Both are predicates the build script evaluates against the pipeline output, so that a claim like "the ATE estimate is large and negative" is settled by asking whether the interval excludes zero rather than by an author's judgement about what counts as large.
 
 ```{r gt_table}
 gt |>
   mutate(across(everything(), \(x) replace_na(as.character(x), ""))) |>
-  select(table_figure, claim, value_paper, value_script, match) |>
+  select(table_figure, claim, value_paper, value_script, match, holds) |>
   kable(
     booktabs = TRUE,
-    col.names = c("Location", "Claim", "Chapter", "Archive data", "Match"),
-    caption = "Ground truth: what the chapter states against what the deposited data and scripts produce. A blank Match means the chapter does not state the quantity."
+    col.names = c("Location", "Claim", "Chapter", "Archive data", "Match", "Holds"),
+    caption = "Ground truth: what the chapter states against what the deposited data and scripts produce. Both verdict columns blank means the chapter does not state the quantity."
   ) |>
   latex_only(\(k) k |>
     kable_styling(latex_options = c("hold_position", "repeat_header"), font_size = 6) |>
@@ -252,7 +313,8 @@ read_csv(here::here("maintained", "output", "figure_3_blocked_block_ates.csv"),
          show_col_types = FALSE) |>
   transmute(
     Neighborhood = neighborhood,
-    Residents = c(50, 100),
+    Residents = c(param("Figures 17.2 and 17.3", "N in neighborhood 1"),
+                  param("Figures 17.2 and 17.3", "N in neighborhood 2")),
     `Pr(treated)` = sprintf("%.2f", prob_treated),
     Effect = sprintf("%.2f", estimate),
     SE = sprintf("%.2f", std.error),
@@ -265,19 +327,61 @@ read_csv(here::here("maintained", "output", "figure_3_blocked_block_ates.csv"),
   latex_only(\(k) k |> kable_styling(latex_options = "hold_position", font_size = 9))
 ```
 
-The large negative effect is in neighborhood 1 and the small one is in neighborhood 2. Three independent sources agree: the deposited dataset, the deposited generator, whose potential outcomes are written `-4 * Z * (neighborhood == 1)`, and the published figure itself, whose left facet is labelled "Neighborhood 1" and shows a drop from 10.5 to 6.2. Only the sentence on the facing page has them the other way round. Nothing in the code needs changing and the maintained rewrite reproduces the figure as published; the error is in the prose.
+The large negative effect is in neighborhood 1 and the small one is in neighborhood 2. Three independent sources agree: the deposited dataset, the deposited generator, whose potential outcomes are written `-4 * Z * (neighborhood == 1)`, and the published figure itself, whose left facet is labelled "Neighborhood 1" and shows a drop from `r block_mean(1, "Control")` to `r block_mean(1, "Treatment")`. Only the sentence on the facing page has them the other way round. Nothing in the code needs changing and the maintained rewrite reproduces the figure as published; the error is in the prose.
+
+## The blocks that are called schools
+
+The very next sentence reads:
+
+> By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across schools and within treatment group.
+
+There are no schools in this design. The blocked example has `r param("Figures 17.2 and 17.3", "Number of neighborhoods")` neighborhoods of `r param("Figures 17.2 and 17.3", "N in neighborhood 1")` and `r param("Figures 17.2 and 17.3", "N in neighborhood 2")` residents, and the horizontal axis of the published Figure 17.3b is labelled "Neighborhood 1" and "Neighborhood 2". The chapter's classroom example is the cluster-randomized experiment two sections later. The word is a slip in a paragraph that otherwise names the neighborhoods correctly four times, but it names a design feature the example does not have, which is why it belongs with the other corrections rather than in a list of typographical points.
+
+The published panel (b) is also where the deposit falls short of the book a second time. `blocked.R` abbreviates the horizontal axis labels of that panel to `N/hood 1` and `N/hood 2` while writing panel (a)'s in full, so running the deposited script does not produce the published labels. Nothing published is wrong here; as with the Figure 17.4 panel (b) label below, the published figure is the better one.
 
 ## The 400 to 1600 point scale
 
-The clustered example describes an outcome "measured on a 400-1600-point scale", and both panels of Figure 17.4 set their limits accordingly. The simulated outcomes run from 217 to 1720, so eight of the 441 students sit outside the stated scale and are clipped out of the figure by `coord_cartesian()`. The design draws a classroom shock at `rnorm(30, 1000, 100)` and a student shock at `rnorm(n, sd = 175)`, which puts about two percent of the distribution outside the range on arithmetic alone. The clipping is the chapter's own choice and the rewrite keeps it; the mismatch is between the data and the sentence that describes them.
+The clustered example describes an outcome "measured on a 400-1600-point scale", and both panels of Figure 17.4 set their limits accordingly. The simulated outcomes run from `r param("Figure 17.4", "Outcome range")`, so `r target("Figure 17.4", "Students with an outcome outside the stated 400 to 1600 scale")` of the `r target("Figure 17.4", "Students in total")` students sit outside the stated scale and are clipped out of the figure by `coord_cartesian()`. The design draws a classroom shock at `rnorm(30, 1000, 100)` and a student shock at `rnorm(n, sd = 175)`, which puts about two percent of the distribution outside the range on arithmetic alone. The clipping is the chapter's own choice and the rewrite keeps it; the mismatch is between the data and the sentence that describes them.
+
+## The Likert scale that is not one
+
+The vertical axis of Figure 17.5 reads `Outcome variable (raw scale is 7-point Likert)`. The outcome it plots is not a Likert item and is not seven-point. It takes `r param("Figure 17.5", "Number of distinct outcome values")` distinct values across `r param("Figure 17.5", "N")` units, running from `r param("Figure 17.5", "Outcome range")`, and `r target("Figure 17.5", "Units with an outcome outside the 1 to 7 range the axis label implies")` of them fall outside the 1 to 7 range a seven-point item allows. The generator draws it as `Y ~ 0.5 * Z + 1.0 * X + 0.5 * Z * X + U` with a normal covariate and a normal disturbance, and the unadjusted facet's own axis runs from 0 to 10, which is the shape of a continuous variable rather than an ordinal one. The chapter's only Likert outcome is Figure 17.8's attrition example, which is genuinely seven-point.
+
+`covariate_adjustment.R` writes this label, so the chapter printed what its own code gave it, and the maintained rewrite keeps the label as deposited rather than silently improving it. Nothing plotted in the figure is affected: the correction is to the axis title alone.
 
 ## The relabelled panel
 
-`clustered.R` gives both panels the y-axis label `Outcome variable: Classroom Average SAT score`. Panel (b) plots students rather than classes, and the published panel (b) is labelled `Outcome variable: SAT score`. The book restyled every axis label in the chapter to sentence case, so some difference was expected; what makes this one substantive is that the restyling also dropped "classroom average", which is a correction rather than a matter of house style. The published figure is the better one and the deposited code does not produce it. This is the only place in the archive where running the deposited script yields a figure that differs from the published one in something other than jitter.
+`clustered.R` gives both panels the y-axis label `Outcome variable: Classroom Average SAT score`. Panel (b) plots students rather than classes, and the published panel (b) is labelled `Outcome variable: SAT score`. The book restyled every axis label in the chapter to sentence case, so some difference was expected; what makes this one substantive is that the restyling also dropped "classroom average", which is a correction rather than a matter of house style. The published figure is the better one and the deposited code does not produce it.
+
+# The extraction and the two instruments
+
+A table of claims can only be as complete as the reading behind it, and a table built up figure by figure has no way to notice a sentence nobody thought to check. So the chapter was read a second time as an inventory rather than as an argument: every numeral in the body text, every number spelled out in words, and every quantity a figure asserts without printing it, each recorded with where it appears and what kind of claim it is. That inventory is `ground_truth/published_claims.csv`, `r n_extraction` rows, hand-reviewed and committed.
+
+```{r extraction_table}
+published_claims |>
+  count(claim_type, needs_block, name = "n") |>
+  mutate(needs_block = if_else(needs_block, "Yes", "No")) |>
+  kable(
+    booktabs = TRUE,
+    col.names = c("Claim type", "Recomputed", "Rows"),
+    caption = "The extraction. A claim is recomputed when the pipeline can reach the quantity; the rest are verified where they are used, or belong to a cited source rather than to this chapter."
+  ) |>
+  latex_only(\(k) k |> kable_styling(latex_options = "hold_position", font_size = 9))
+```
+
+No row is typed `pipeline`, and that is the finding rather than an oversight: the chapter states no estimate anywhere. What it does state is design parameters, response scales, axis labels and claims about the shape of its own results, so a check on this chapter is mostly a check on whether the simulated data behind a figure are what the surrounding sentence says they are. Three of the `r spell(n_paper_internal)` errata came out of this pass, and only one of them, the transposed neighborhoods, was reachable by asking what a figure plots.
+
+`r str_to_sentence(spell(sum(published_claims$claim_type == "transcribed")))` rows are `transcribed`: Fisher's eight cups of tea and the four assigned to milk first, the seventy ways of allocating them, the MIDA framework's four elements, Healy's three dimensions of criticism, and the differencing intuition from Gerber and Green. These belong to the works the chapter cites, cannot drift, and were checked once against those works.
+
+`maintained/in_text_claims.R` is the second instrument. It carries `r n_blocks` blocks, one for each extraction row the pipeline can reach: the published sentence verbatim in a comment, then code that reads `maintained/output/` and prints the quantity in the chapter's own units, labelled. It recomputes nothing. Estimation happens once, in the figure scripts; only derivation happens twice, and it takes a different route each time. The chapter's two group sizes, for instance, are read out of the deposited dataset by `text_design_parameters.R` and recovered here from the residual degrees of freedom of the two regressions Figure 17.1 plots. The confidence level the chapter calls 95 per cent is recovered from the interval half-widths rather than asserted. The imputation range behind the extreme value bounds is recovered from the distance between the two bounds and the number of missing outcomes, without knowing how those missing outcomes split across arms.
+
+`build_ground_truth.R` ends by running that file as a program, not by reading it as text, since a block that errors or prints nothing would satisfy any textual check. It captures what the file prints and requires three things: that the number of claims printed equal the number of extraction rows needing a block, and that the two sets of identifiers be equal in both directions; that the chapter's own values, transcribed independently into the extraction and into the ground truth, agree string for string; and that wherever both instruments arrive at a bare number, they agree at the precision the extraction records for that claim. The claims file is sourced into its own environment, because the two files necessarily read the same outputs and name the same things, and a bare `source()` would replace the build's objects with the claims file's before any of those assertions ran.
+
+Of the failing claims, `r spell(n_paper_internal)` fail in a way that is the chapter's own rather than the deposit's or the environment's. Those are set out in `coppock_2021_errata.pdf` at the root of this repository: the published sentence, the corrected sentence with the changed token in bold, and the evidence. Every number in that document is computed from `maintained/output/` when it is rendered, including the numbers that were not wrong. None of the `r spell(n_paper_internal)` changes a conclusion of the chapter.
 
 # Maintained rewrite
 
-The rewrite lives in `maintained/`: seven figure scripts, two scripts for quantities that belong to no single figure, a port of the data generator, and a shared `helpers.R`. It is a translation, not a reanalysis: every estimator and every plotted quantity is the one the chapter used.
+The rewrite lives in `maintained/`: seven figure scripts, four scripts for quantities that belong to no single figure, a port of the data generator, and a shared `helpers.R`. It is a translation, not a reanalysis: every estimator and every plotted quantity is the one the chapter used.
 
 ```{r scripts_table}
 tibble(
@@ -290,6 +394,8 @@ tibble(
     "figure_7_noncompliance.R",
     "figure_8_attrition.R",
     "text_design_parameters.R",
+    "text_descriptive_claims.R",
+    "in_text_claims.R",
     "text_stata_equivalent.R",
     "text_archive_agreement.R",
     "make_datasets.R"
@@ -303,6 +409,8 @@ tibble(
     "Figure 17.7, both panels",
     "Figure 17.8",
     "The design facts the chapter states in prose",
+    "The three response scales the chapter states a bound for",
+    "The claim-by-claim audit trail, and the coverage gate's input",
     "The deposited Stata file's estimator, in R, against the R script's",
     "Every figure's estimates re-derived from the deposit, against the rewrite's",
     "The seven simulated datasets, regenerated under the current DeclareDesign API"
@@ -452,7 +560,7 @@ knitr::include_graphics(
 )
 ```
 
-All fourteen panels reproduce the published figures. Beyond the seeded jitter and the Figure 17.4 axis label, no panel differs from its published counterpart.
+All fourteen panels reproduce the published figures. Beyond the seeded jitter, the two axis labels the book improved on, and the Figure 17.5 axis label that neither the book nor the deposit got right, no panel differs from its published counterpart.
 
 ```{r design_table}
 design_parameters |>

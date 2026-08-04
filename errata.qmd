@@ -1,0 +1,103 @@
+---
+title: "Errata"
+subtitle: "On Coppock (2021), \"Visualize as You Randomize,\" chapter 17 of *Advances in Experimental Political Science*"
+format:
+  pdf:
+    output-file: coppock_2021_errata.pdf
+    geometry: margin=1.25in
+    fontsize: 11pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(here)
+library(tidyverse)
+here::i_am("errata.qmd")
+
+# Every number in a corrected sentence below is computed here, at render time, from
+# the output the maintained rewrite writes. Nothing is typed. That includes numbers
+# that were not wrong: a token carried over from the published sentence is otherwise
+# inherited on trust rather than verified.
+out <- function(f) read_csv(here("maintained", "output", f), show_col_types = FALSE)
+
+design <- out("text_design_parameters.csv")
+descriptive <- out("text_descriptive_claims.csv")
+block_ates <- out("figure_3_blocked_block_ates.csv")
+facets <- out("figure_3_blocked_facets_estimates.csv")
+
+param <- function(fig, q) {
+  v <- design$value[design$figure == fig & design$quantity == q]
+  stopifnot(length(v) == 1)
+  v
+}
+
+target <- function(fig, q) {
+  v <- descriptive$value[descriptive$figure == fig & descriptive$quantity == q]
+  stopifnot(length(v) == 1)
+  v
+}
+
+block_ate <- function(n) {
+  v <- block_ates$estimate[block_ates$neighborhood == n]
+  stopifnot(length(v) == 1)
+  # An en dash for the minus sign, matching the chapter's own typesetting.
+  str_replace(sprintf("%.2f", v), "^-", "--")
+}
+
+block_mean <- function(n, cond) {
+  v <- facets$estimate[facets$panel == "Faceted by block" &
+                         facets$block == paste("Neighborhood", n) &
+                         facets$condition == cond]
+  stopifnot(length(v) == 1)
+  sprintf("%.2f", v)
+}
+
+# The chapter writes its ranges with an en dash; the pipeline writes "a to b".
+en_range <- function(s) str_replace(s, " to ", "--")
+```
+
+This note lists four corrections to "Visualize as You Randomize: Design-Based Statistical Graphs for Randomized Experiments," chapter 17 of *Advances in Experimental Political Science* (Druckman and Green, eds., Cambridge University Press, 2021, pp. 320--336), doi [10.1017/9781108777919.022](https://doi.org/10.1017/9781108777919.022). **None of them changes a conclusion of the chapter**, which is a methodological argument about how to draw statistical graphs for randomized experiments and does not rest on any quantity below. Three are sentences that misdescribe the simulated data behind a figure; the fourth is a vertical axis label that misdescribes the outcome it plots. Every figure in the chapter is correct as printed, and none is reprinted here.
+
+All the data in the chapter are simulated, and the deposited datasets ([10.7910/DVN/VE6VSR](https://doi.org/10.7910/DVN/VE6VSR)) are what the figures are drawn from. Every number in a corrected sentence and in the notes below is computed from those datasets at the time this document is rendered. Bold marks what has changed. The code and output supporting each correction are in the actively maintained replication repository for this chapter, `active-maintenance-aec/coppock_2021`.
+
+## 1. The two neighborhoods are transposed in the discussion of Figure 17.3
+
+> In Figure 17.3a, we facet by block. Within each facet, the groups that are compared are formed by random assignment: we see small effects of treatment in neighborhood **1** and large negative effects of treatment in neighborhood **2**.
+
+Corrected:
+
+> In Figure 17.3a, we facet by block. Within each facet, the groups that are compared are formed by random assignment: we see small effects of treatment in neighborhood **2** and large negative effects of treatment in neighborhood **1**.
+
+The large negative effect is in neighborhood 1, where the treated mean is `r block_mean(1, "Treatment")` against a control mean of `r block_mean(1, "Control")`, an effect of `r block_ate(1)`. In neighborhood 2 the effect is `r block_ate(2)`. Figure 17.3 itself is right: its left facet is labelled "Neighborhood 1" and shows the drop, and the deposited data generator writes the effect as `-4 * Z * (neighborhood == 1)`. Only the sentence describing the figure is wrong.
+
+## 2. The vertical axis of Figure 17.5 misdescribes the raw outcome scale
+
+The vertical axis of Figure 17.5 is labelled:
+
+> Outcome variable **(raw scale is 7-point Likert)**
+
+Corrected:
+
+> Outcome variable **(raw scale is continuous, `r en_range(param("Figure 17.5", "Outcome range"))`)**
+
+The outcome plotted in the unadjusted facet takes `r param("Figure 17.5", "Number of distinct outcome values")` distinct values across `r param("Figure 17.5", "N")` units, running from `r param("Figure 17.5", "Outcome range")`, and `r target("Figure 17.5", "Units with an outcome outside the 1 to 7 range the axis label implies")` of them fall outside the 1 to 7 range a seven-point item allows. The generator draws the outcome as `Y ~ 0.5 * Z + 1.0 * X + 0.5 * Z * X + U` with a normal covariate and normal disturbance, so nothing about it is an ordinal item; the facet's own axis runs from 0 to 10. The chapter's only Likert outcome is the attrition example in Figure 17.8, which is genuinely seven-point. The deposited script writes this label, so the chapter printed what its own code gave it. Nothing plotted in Figure 17.5 changes, and the figure is not reprinted: the correction is to the axis title alone.
+
+## 3. The clustered outcome is not confined to the scale the chapter states
+
+> In this example, we imagine a "test-prep" treatment that is randomly assigned to some classrooms but not to others; the outcome is measured on a **400--1600**-point scale.
+
+Corrected:
+
+> In this example, we imagine a "test-prep" treatment that is randomly assigned to some classrooms but not to others; the outcome is measured on a **`r en_range(param("Figure 17.4", "Outcome range"))`**-point scale.
+
+The example intends the SAT scale, and the deposited generator does not enforce it: it draws a classroom shock and a student shock from unbounded normal distributions, so `r target("Figure 17.4", "Students with an outcome outside the stated 400 to 1600 scale")` of the `r target("Figure 17.4", "Students in total")` simulated students score outside 400 to 1600. Both panels of Figure 17.4 set their limits at 400 and 1600, so those students are clipped out of the published figure and a reader cannot see them. The clipping is the chapter's own choice about the figure; what is wrong is the sentence's claim about the data.
+
+## 4. Figure 17.3b compares neighborhoods, not schools
+
+> By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across **schools** and within treatment group.
+
+Corrected:
+
+> By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across **neighborhoods** and within treatment group.
+
+The blocked example has `r param("Figures 17.2 and 17.3", "Number of neighborhoods")` neighborhoods, of `r param("Figures 17.2 and 17.3", "N in neighborhood 1")` and `r param("Figures 17.2 and 17.3", "N in neighborhood 2")` residents, and the horizontal axis of the published Figure 17.3b is labelled "Neighborhood 1" and "Neighborhood 2". There are no schools in this design. The chapter's classroom example is the cluster-randomized experiment of Figure 17.4, two sections later.

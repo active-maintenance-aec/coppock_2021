@@ -1,0 +1,66 @@
+claim_id,location,claim_type,value_paper,needs_block,digits,note
+fisher_cups_total,"Section 17.1, p. 321",transcribed,"8",FALSE,,"Fisher's tea-tasting experiment, attributed to Fisher (1935, p. 13); nothing in this chapter's data bears on it"
+fisher_cups_milk_first,"Section 17.1, p. 321",transcribed,"4",FALSE,,"As above; checked once against the cited source"
+fisher_allocations,"Section 17.1, p. 321",transcribed,"70",FALSE,,"choose(8, 4) = 70; arithmetic on the transcribed design, checked once"
+fisher_not_two_or_six,"Section 17.1, p. 322",transcribed,"2 or 6",FALSE,,"Restates the tea-tasting design; no counterpart in the deposit"
+mida_elements,"Section 17.2, p. 322",structural,"four",FALSE,,"The MIDA framework of Blair et al. (2019); verified against that paper"
+two_potential_outcomes,"Section 17.2, p. 322",definitional,"two",FALSE,,"A property of the theoretical model the chapter describes, not of any deposited file"
+canvassing_effect_pp,"Section 17.2, p. 322",definitional,"10",TRUE,1,"Hedged: 'by, for example, 10 percentage points'. The realised difference in means behind Figure 17.1 is the check"
+two_arm_sample,"Section 17.2, p. 323",definitional,"500",TRUE,0,"Same design parameter as fig1_n, stated a second time in the design vocabulary section"
+two_arm_assigned,"Section 17.2, p. 323",definitional,"100",TRUE,0,"Same design parameter as fig1_n_treated"
+resres_two_equations,"Section 17.3, p. 324",structural,"two",FALSE,,"Verified at the point of use: figure_5_covariate_adjustment.R fits exactly two auxiliary regressions"
+resres_equals_mr,"Section 17.3, p. 324",descriptive,"exactly equal",TRUE,4,"The res-res slope against the multiple regression estimate"
+three_dimensional_plot,"Section 17.3, p. 324",definitional,"three",FALSE,,"Describes a plot the chapter says is hard to draw and does not draw"
+three_guidelines,"Section 17.4, p. 325",structural,"three",FALSE,,"Counted in the chapter's own text; no counterpart in the deposit"
+healy_three_dimensions,"Section 17.4, p. 326",transcribed,"three",FALSE,,"Attributed to Healy (2018)"
+archive_doi,"Footnote 3, p. 326",definitional,"10.7910/DVN/VE6VSR",TRUE,,"The chapter's own pointer to its deposit, checked against the DOI this repository fetches"
+stata_code_provided,"Footnote 3, p. 326",definitional,"provided",TRUE,,"'Equivalent Stata code for Figure 17.1 is also provided'"
+fig1_n,"Section 17.5.1, p. 326",definitional,"500",TRUE,0,
+fig1_n_treated,"Section 17.5.1, p. 326",definitional,"100",TRUE,0,
+fig1_outcome_binary,"Section 17.5.1, p. 326",definitional,"binary",TRUE,,
+fig1_ci_level,"Section 17.5.1, p. 327",definitional,"95",TRUE,0,"Recovered from the interval half-widths and the residual degrees of freedom"
+fig1b_two_numbers,"Section 17.5.1, p. 327",structural,"two",TRUE,0,"'It only displays two numbers': the bad panel plots the two group means and nothing else"
+fig1_axis_breaks,"Figure 17.1, p. 327",structural,"0.00, 0.25, 0.50, 0.75, 1.00",FALSE,,"Verified at the point of use: scale_y_continuous in figure_1_two_arm_trial.R"
+fig1_axis_label,"Figure 17.1, p. 327",definitional,"Outcome variable [1 = Yes, 0 = otherwise]",FALSE,,"Verified at the point of use in figure_1_two_arm_trial.R"
+blocked_n_neighborhoods,"Section 17.5.2, p. 327",definitional,"2",TRUE,0,
+blocked_n1,"Section 17.5.2, p. 327",definitional,"50",TRUE,0,
+blocked_n2,"Section 17.5.2, p. 327",definitional,"100",TRUE,0,
+blocked_n_treated,"Section 17.5.2, p. 327",definitional,"25",TRUE,0,
+blocked_prob_higher_first,"Section 17.5.2, p. 327",descriptive,"higher in the first",TRUE,,
+blocked_outcome_count,"Section 17.5.2, p. 328",definitional,"count",TRUE,,"'The outcome is a count of some behavioral outcome': checkable as non-negative integers"
+blocked_weighted_ate,"Section 17.5.2, p. 328",descriptive,"large and negative",TRUE,3,
+blocked_unweighted_ate,"Section 17.5.2, p. 328",descriptive,"close to zero",TRUE,3,
+fig3_block_effects,"Section 17.5.2, p. 328",descriptive,"small in 1 and large negative in 2",TRUE,2,
+fig3b_across_schools,"Section 17.5.2, p. 328",descriptive,"schools",TRUE,,"'we compare across schools and within treatment group', of a design with two neighborhoods"
+fig3b_axis_labels,"Figure 17.3, p. 329",definitional,"Neighborhood 1",TRUE,,"The horizontal axis labels of Figure 17.3b, checked against the labels the deposited script writes"
+fig2_axis_breaks,"Figure 17.2, p. 328",structural,"4, 8, 12, 16",FALSE,,"Verified at the point of use in figure_2_blocked_experiment.R"
+clustered_outcome_scale,"Section 17.5.3, p. 329",definitional,"400 to 1600",TRUE,,
+clustered_either_or,"Section 17.5.3, p. 329",descriptive,"either approach",TRUE,,
+fig4a_point_size,"Section 17.5.3, p. 329",structural,"proportional to cluster size",FALSE,,"Verified at the point of use: the size aesthetic in figure_4_clustered_experiment.R"
+fig4_ci_level,"Section 17.5.3, p. 329",definitional,"95",TRUE,0,"Recovered from the clustered interval half-widths and their degrees of freedom"
+fig4_means_same,"Section 17.5.3, p. 329",descriptive,"the same in both panels",TRUE,,
+fig4_ci_ignore_clustering,"Section 17.5.3, p. 329",descriptive,"narrower",TRUE,,
+fig4b_axis_label,"Figure 17.4, p. 330",definitional,"Outcome variable: SAT score",TRUE,,
+fig4_axis_breaks,"Figure 17.4, p. 330",structural,"400, 800, 1200, 1600",FALSE,,"Verified at the point of use in figure_4_clustered_experiment.R"
+pretest_coefficient_one,"Section 17.5.4, p. 329",transcribed,"1",FALSE,,"The differencing intuition attributed to Gerber and Green (2012, ch. 4)"
+fig5_lin_separately,"Section 17.5.4, p. 330",descriptive,"equivalent",TRUE,4,"lm_lin against the interacted, centred-covariate regression"
+fig5_scale_not_range,"Section 17.5.4, p. 330",descriptive,"the same scale but not the same range",TRUE,,
+fig5_axis_label_likert,"Figure 17.5, p. 330",definitional,"7-point Likert",TRUE,,"The vertical axis label of Figure 17.5, checked against the deposited outcome"
+fig5_axis_breaks,"Figure 17.5, p. 330",structural,"-6 to 12",FALSE,,"Verified at the point of use in figure_5_covariate_adjustment.R"
+fig6_cate_signs,"Section 17.5.5, p. 331",descriptive,"negative at low and positive at high",TRUE,,
+fig6_fit_low,"Section 17.5.5, p. 331",descriptive,"does not fit well, especially at low values",TRUE,,
+fig6_shapes,"Section 17.5.5, p. 331",structural,"triangles and circles",FALSE,,"Verified at the point of use: the shape aesthetic in figure_6_interaction_continuous.R"
+fig6_cate_grid,"Section 17.5.5, p. 331",structural,,TRUE,0,"'the estimated CATE for a series of values of the covariate': the chapter gives no count, the figure asserts one"
+fig6_axis_breaks,"Figure 17.6, p. 331",structural,"-2 to 2",FALSE,,"Verified at the point of use in figure_6_interaction_continuous.R"
+noncompliance_two_dvs,"Section 17.5.6, p. 332",structural,"two",TRUE,0,"'the effect of assignment on two post-treatment variables'"
+fig7_two_facets,"Section 17.5.6, p. 332",structural,"separate facets",FALSE,,"Verified at the point of use in figure_7_noncompliance.R"
+fig7_two_sided,"Figure 17.7, p. 333",descriptive,"two-sided",TRUE,,
+fig7_axis_breaks,"Figure 17.7, p. 333",structural,"0.00, 0.25, 0.50, 0.75, 1.00",FALSE,,"Verified at the point of use in figure_7_noncompliance.R"
+attrition_likert_scale,"Section 17.5.7, p. 332",definitional,"seven point Likert",TRUE,,
+attrition_bound_imputation,"Section 17.5.7, p. 332",definitional,"maximum and minimum",TRUE,,"The upper bound imputes the maximum for missing treated units and the minimum for missing control units"
+fig8_lower_bound,"Section 17.5.7, p. 333",descriptive,"very similar and close to zero",TRUE,2,
+fig8_upper_bound,"Section 17.5.7, p. 333",descriptive,"close to a full-scale point",TRUE,2,
+fig8_bounds_range,"Section 17.5.7, p. 333",descriptive,"zero and one",TRUE,2,"'the ATE is likely to lie somewhere between zero and one', hedged and about quantities the chapter says are themselves estimates"
+fig8_axis_anchors,"Figure 17.8, p. 333",definitional,"1: strongly disagree, 7: strongly agree",FALSE,,"Verified at the point of use in figure_8_attrition.R"
+fig8_colour_shape,"Section 17.5.7, p. 333",structural,"blue circles and gold triangles",FALSE,,"Verified at the point of use: the colour and shape aesthetics in figure_8_attrition.R"
+r_year_of_writing,"Section 17.6, p. 334",definitional,"2019",FALSE,,"The year the chapter was written; nothing in the deposit records it"

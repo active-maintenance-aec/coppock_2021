@@ -22,21 +22,21 @@ clustered_sizes <- clustered |> distinct(class, n_per_class)
 
 design_parameters <- tibble(
   figure = c(
-    rep("Figure 17.1", 2),
-    rep("Figures 17.2 and 17.3", 5),
+    rep("Figure 17.1", 4),
+    rep("Figures 17.2 and 17.3", 7),
     rep("Figure 17.4", 5),
-    rep("Figure 17.5", 2),
+    rep("Figure 17.5", 3),
     rep("Figure 17.6", 1),
     rep("Figure 17.7", 3),
     rep("Figure 17.8", 3)
   ),
   quantity = c(
-    "N", "N treated",
+    "N", "N treated", "Number of distinct outcome values", "Outcome range",
     "N", "Number of neighborhoods", "N in neighborhood 1", "N in neighborhood 2",
-    "N treated per neighborhood",
+    "N treated per neighborhood", "Outcome range", "Number of non-integer outcomes",
     "N students", "Number of classes", "Smallest class", "Largest class",
     "Outcome range",
-    "N", "Number of distinct outcome values",
+    "N", "Number of distinct outcome values", "Outcome range",
     "N",
     "N", "N assigned to treatment", "N assigned to control",
     "N", "N missing an outcome", "Outcome range"
@@ -44,11 +44,15 @@ design_parameters <- tibble(
   value = c(
     as.character(nrow(two_arm)),
     as.character(sum(two_arm$Z == 1)),
+    as.character(n_distinct(two_arm$Y)),
+    paste(range(two_arm$Y), collapse = " to "),
     as.character(nrow(blocked)),
     as.character(n_distinct(blocked$neighborhood)),
     as.character(blocked_counts$n_residents[blocked_counts$neighborhood == 1]),
     as.character(blocked_counts$n_residents[blocked_counts$neighborhood == 2]),
     paste(unique(blocked_treated$n_treated), collapse = ", "),
+    paste(range(blocked$Y), collapse = " to "),
+    as.character(sum(blocked$Y != round(blocked$Y) | blocked$Y < 0)),
     as.character(nrow(clustered)),
     as.character(n_distinct(clustered$class)),
     as.character(min(clustered_sizes$n_per_class)),
@@ -56,6 +60,7 @@ design_parameters <- tibble(
     paste(round(range(clustered$Y)), collapse = " to "),
     as.character(nrow(covariate)),
     as.character(n_distinct(covariate$Y)),
+    paste(round(range(covariate$Y), 1), collapse = " to "),
     as.character(nrow(interaction)),
     as.character(nrow(noncompliance)),
     as.character(sum(noncompliance$Z == "Treatment")),

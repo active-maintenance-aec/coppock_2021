@@ -21,6 +21,9 @@ source(here::here("maintained", "figure_8_attrition.R"))
 
 # In-text quantities ----
 source(here::here("maintained", "text_design_parameters.R"))
+# The one script holding numbers taken from the chapter: a stated bound cannot be
+# checked without the bound. They are comparison targets and feed no estimate.
+source(here::here("maintained", "text_descriptive_claims.R"))
 source(here::here("maintained", "text_stata_equivalent.R"))
 # Reads the figure scripts' output, so it comes after them.
 source(here::here("maintained", "text_archive_agreement.R"))
@@ -31,8 +34,13 @@ source(here::here("maintained", "text_archive_agreement.R"))
 source(here::here("maintained", "make_datasets.R"))
 
 # Ground truth ----
-# Rebuilds the comparison table from the outputs above, so it cannot go stale.
+# Rebuilds the comparison table from the outputs above, so it cannot go stale, and
+# ends with the coverage gate, which runs in_text_claims.R and counts what it prints.
 source(here::here("ground_truth", "build_ground_truth.R"))
+
+# In-text claims ----
+# Run a second time, for the human-readable audit trail rather than for the gate.
+source(here::here("maintained", "in_text_claims.R"))
 
 # Deposited archive, again ----
 # The check at the top of this file is a precondition: it says original/ was intact

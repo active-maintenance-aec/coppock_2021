@@ -1,11 +1,15 @@
 figure,quantity,value
 Figure 17.1,N,500
 Figure 17.1,N treated,100
+Figure 17.1,Number of distinct outcome values,2
+Figure 17.1,Outcome range,0 to 1
 Figures 17.2 and 17.3,N,150
 Figures 17.2 and 17.3,Number of neighborhoods,2
 Figures 17.2 and 17.3,N in neighborhood 1,50
 Figures 17.2 and 17.3,N in neighborhood 2,100
 Figures 17.2 and 17.3,N treated per neighborhood,25
+Figures 17.2 and 17.3,Outcome range,1 to 16
+Figures 17.2 and 17.3,Number of non-integer outcomes,0
 Figure 17.4,N students,441
 Figure 17.4,Number of classes,30
 Figure 17.4,Smallest class,10
@@ -13,6 +17,7 @@ Figure 17.4,Largest class,20
 Figure 17.4,Outcome range,217 to 1720
 Figure 17.5,N,100
 Figure 17.5,Number of distinct outcome values,100
+Figure 17.5,Outcome range,0.6 to 8.7
 Figure 17.6,N,1189
 Figure 17.7,N,600
 Figure 17.7,N assigned to treatment,300

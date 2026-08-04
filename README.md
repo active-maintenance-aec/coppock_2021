@@ -11,8 +11,14 @@
   - [The Stata file](#the-stata-file)
 - [Number-by-number comparison](#number-by-number-comparison)
   - [The transposed neighborhoods](#the-transposed-neighborhoods)
+  - [The blocks that are called
+    schools](#the-blocks-that-are-called-schools)
   - [The 400 to 1600 point scale](#the-400-to-1600-point-scale)
+  - [The Likert scale that is not
+    one](#the-likert-scale-that-is-not-one)
   - [The relabelled panel](#the-relabelled-panel)
+- [The extraction and the two
+  instruments](#the-extraction-and-the-two-instruments)
 - [Maintained rewrite](#maintained-rewrite)
   - [Deprecated patterns replaced](#deprecated-patterns-replaced)
   - [Three things left alone](#three-things-left-alone)
@@ -56,9 +62,15 @@ script per published figure, writing to `output/`, which is committed so
 a reader can compare a fresh run against it without downloading
 anything. `ground_truth/` ties every claim the chapter makes about its
 figures to the code that produces it, and is itself built by a script
-rather than typed. `original/` is created by the download script and is
-deliberately absent from the repository. This file is the
-reproducibility report, also available as a PDF in `report/`.
+rather than typed; `ground_truth/published_claims.csv` is the
+extraction, a hand-reviewed inventory of every number and counted
+quantity in the chapter. `maintained/in_text_claims.R` recomputes each
+of those the pipeline can reach and prints it beside the sentence that
+states it. `coppock_2021_errata.pdf` lists the sentences and labels in
+the chapter that the deposited data do not support. `original/` is
+created by the download script and is deliberately absent from the
+repository. This file is the reproducibility report, also available as a
+PDF in `report/`.
 
 **License.** CC0 1.0 Universal, matching the terms of the deposit this
 repository maintains, so nothing in the chain is more restrictive than
@@ -72,14 +84,16 @@ source("run_all.R")
 ```
 
 That fetches the deposit, verifies its seventeen checksums, produces
-every figure into `maintained/output/`, and rebuilds the ground truth
-table from those outputs. It takes about ten seconds. Required packages:
-tidyverse, estimatr, broom, margins, DeclareDesign, knitr, kableExtra,
-here. Paths resolve through `here`, so nothing depends on the working
-directory and the scripts work equally well under `Rscript` outside
-RStudio. Individual scripts can be run on their own in any order, with
-two exceptions: `text_archive_agreement.R` reads the figure scripts’
-output and `build_ground_truth.R` reads everything, so both come last.
+every figure into `maintained/output/`, rebuilds the ground truth table
+from those outputs, runs the coverage gate over the claims file, and
+prints the claim-by-claim audit trail. It takes about ten seconds.
+Required packages: tidyverse, estimatr, broom, margins, DeclareDesign,
+knitr, kableExtra, here. Paths resolve through `here`, so nothing
+depends on the working directory and the scripts work equally well under
+`Rscript` outside RStudio. Individual scripts can be run on their own in
+any order, with two exceptions: `text_archive_agreement.R` reads the
+figure scripts’ output and `build_ground_truth.R` reads everything, so
+both come last.
 
 A successful run overwrites `maintained/output/`, which is committed:
 **`git diff` on that folder is the reproduction check**, and the CSV and
@@ -116,36 +130,53 @@ the old assignment and sampling syntax behind `legacy = TRUE`.
 
 ## Does the maintained rewrite reproduce the chapter?
 
-Yes for the figures, with three exceptions, two of which belong to the
-chapter rather than to the code. Of 35 recorded claims, 23 can be
-checked against the published chapter; 20 match and 3 do not. The 12
+Every figure reproduces. What does not is a handful of claims the
+chapter makes about those figures, most of which belong to the chapter
+rather than to the code. Of 40 recorded claims, 27 can be checked
+against the published chapter; 21 hold and 6 do not, four of the latter
+being sentences or labels the chapter’s own data contradict. The 13
 remaining are quantities the chapter never states, which is a large
 share, because this is a methods chapter with no tables and no reported
 estimates: its figures are drawn from simulated data and its claims are
-about shape and direction rather than magnitude.
+about shape and direction rather than magnitude. The four that are the
+chapter’s own are collected in `coppock_2021_errata.pdf` at the root of
+this repository; none of them changes a conclusion.
 
 | Component | Verdict |
 |:---|:---|
-| Figures 17.1, 17.2, 17.5, 17.6, 17.7, 17.8 | Reproduce |
-| Figure 17.3 (blocked, faceted by block) | Figure reproduces; the text describing it transposes the two neighborhoods |
+| Figures 17.1, 17.2, 17.6, 17.7, 17.8 | Reproduce |
+| Figure 17.3 (blocked, faceted by block) | Figure reproduces; the text describing it transposes the two neighborhoods, and calls the blocks schools |
+| Figure 17.3, panel (b) axis labels | The deposited script abbreviates where the published panel spells out |
 | Figure 17.4 (clustered), estimates | Reproduce |
-| Figure 17.4 (clustered), stated outcome scale | Eight of 441 outcomes fall outside the stated 400 to 1600 range |
+| Figure 17.4 (clustered), stated outcome scale | 8 of 441 outcomes fall outside the stated 400 to 1600 range |
 | Figure 17.4 (clustered), panel (b) axis label | The deposited script does not produce the published label |
+| Figure 17.5 (covariate adjustment), estimates | Reproduce |
+| Figure 17.5, vertical axis label | Describes a seven-point Likert raw scale; the outcome takes 100 distinct values |
 | Data generator (seven simulated datasets) | 48 of 60 columns regenerate identically |
 
 Reproduction verdict by component.
 
-The three failures are worth naming. The chapter says the blocked
-experiment shows “small effects of treatment in neighborhood 1 and large
-negative effects of treatment in neighborhood 2”; the two neighborhoods
-are the other way round, in the deposited data, in the deposited
-generator, and in the published figure. The chapter says the clustered
-outcome is “measured on a 400-1600-point scale”; eight of the 441
-simulated outcomes fall outside it and both panels clip. And the
-deposited code labels both panels of Figure 17.4 as classroom averages,
-while the published panel (b), which plots students, is labelled
-“Outcome variable: SAT score”, so that label was corrected somewhere
-between the deposit and the book.
+All six failures are worth naming, and four of them are the chapter’s
+own. It says the blocked experiment shows “small effects of treatment in
+neighborhood 1 and large negative effects of treatment in neighborhood
+2”; the two neighborhoods are the other way round, in the deposited
+data, in the deposited generator, and in the published figure. In the
+next sentence it says Figure 17.3b compares “across schools”, of a
+design with 2 neighborhoods and no schools. It says the clustered
+outcome is “measured on a 400-1600-point scale”; 8 of the 441 simulated
+outcomes fall outside it and both panels clip. And the vertical axis of
+Figure 17.5 calls its raw scale a seven-point Likert, where the outcome
+takes 100 distinct values across 100 units.
+
+The remaining two are the deposit falling short of the book, in the same
+place and in the same direction both times: the deposited scripts label
+two panels less well than the published figures do. `clustered.R` labels
+both panels of Figure 17.4 as classroom averages, while the published
+panel (b), which plots students, is labelled “Outcome variable: SAT
+score”. `blocked.R` abbreviates the horizontal axis of Figure 17.3b to
+“N/hood”, while the published panel spells “Neighborhood” out. In both
+cases the published figure is the better one and running the deposited
+script does not produce it.
 
 # Chapter overview
 
@@ -273,56 +304,63 @@ published number is an input to any computation in this repository.
 The chapter is unusual in what it gives a reader to check. It has no
 tables, prints no estimates, and states no standard errors, so most of
 its checkable content is qualitative: a direction, an ordering, a stated
-range, an axis label. Those rows carry a predicate evaluated against the
-pipeline output rather than a verdict typed by hand, so that a claim
-like “the ATE estimate is large and negative” is settled by asking
-whether the interval excludes zero rather than by an author’s judgement
-about what counts as large.
+range, an axis label. A claim about a value carries its verdict in the
+`Match` column; a claim about shape, sign or ordering has no value to
+compare and carries its verdict in `Holds`. Neither is typed. Both are
+predicates the build script evaluates against the pipeline output, so
+that a claim like “the ATE estimate is large and negative” is settled by
+asking whether the interval excludes zero rather than by an author’s
+judgement about what counts as large.
 
-| Location | Claim | Chapter | Archive data | Match |
-|:---|:---|:---|:---|:---|
-| Figure 17.1 | N | 500 | 500 | 1 |
-| Figure 17.1 | N treated | 100 | 100 | 1 |
-| Figure 17.1 | Control group mean |  | 0.515 |  |
-| Figure 17.1 | Treatment group mean |  | 0.610 |  |
-| Figure 17.1 | The deposited Stata file draws something similar to the R figure |  | intervals differ in width by at most 0.0024 |  |
-| Figures 17.2 and 17.3 | Number of neighborhoods | 2 | 2 | 1 |
-| Figures 17.2 and 17.3 | N in neighborhood 1 | 50 | 50 | 1 |
-| Figures 17.2 and 17.3 | N in neighborhood 2 | 100 | 100 | 1 |
-| Figures 17.2 and 17.3 | N treated per neighborhood | 25 | 25 | 1 |
-| Figures 17.2 and 17.3 | N total |  | 150 |  |
-| Figure 17.2 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 | 1 |
-| Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 | 1 |
-| Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 | 1 |
-| Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 | 0 |
-| Figure 17.4 | Number of classes |  | 30 |  |
-| Figure 17.4 | N students |  | 441 |  |
-| Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 |
-| Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both | 1 |
-| Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 | 1 |
-| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: Classroom Average SAT score | 0 |
-| Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 | 1 |
-| Figure 17.5 | N |  | 100 |  |
-| Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 | 1 |
-| Figure 17.5 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 | 1 |
-| Figure 17.6 | N |  | 1189 |  |
-| Figure 17.6 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 | 1 |
-| Figure 17.6 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin | 1 |
-| Figure 17.7 | N |  | 600 |  |
-| Figure 17.7 | N per assigned arm |  | 300 |  |
-| Figure 17.7 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 | 1 |
-| Figure 17.8 | N |  | 200 |  |
-| Figure 17.8 | N missing an outcome |  | 19 |  |
-| Figure 17.8 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |
-| Figure 17.8 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 | 1 |
-| Figure 17.8 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 | 1 |
+| Location | Claim | Chapter | Archive data | Match | Holds |
+|:---|:---|:---|:---|:---|:---|
+| Figure 17.1 | N | 500 | 500 | 1 |  |
+| Figure 17.1 | N treated | 100 | 100 | 1 |  |
+| Figure 17.1 | Control group mean |  | 0.515 |  |  |
+| Figure 17.1 | Treatment group mean |  | 0.610 |  |  |
+| Figure 17.1 | The deposited Stata file draws something similar to the R figure |  | intervals differ in width by at most 0.0024 |  |  |
+| Figures 17.2 and 17.3 | Number of neighborhoods | 2 | 2 | 1 |  |
+| Figures 17.2 and 17.3 | N in neighborhood 1 | 50 | 50 | 1 |  |
+| Figures 17.2 and 17.3 | N in neighborhood 2 | 100 | 100 | 1 |  |
+| Figures 17.2 and 17.3 | N treated per neighborhood | 25 | 25 | 1 |  |
+| Figures 17.2 and 17.3 | N total |  | 150 |  |  |
+| Figure 17.2 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 |  | 1 |
+| Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  | 1 |
+| Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 |  | 1 |
+| Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | 0 |
+| Figure 17.3 | Panel b compares across schools | schools | N/hood 1, N/hood 2 |  | 0 |
+| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | N/hood 1, N/hood 2 | 0 |  |
+| Figure 17.4 | Number of classes |  | 30 |  |  |
+| Figure 17.4 | N students |  | 441 |  |  |
+| Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 |  |
+| Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  | 1 |
+| Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  | 1 |
+| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: Classroom Average SAT score | 0 |  |
+| Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  | 1 |
+| Figure 17.5 | N |  | 100 |  |  |
+| Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  | 1 |
+| Figure 17.5 | lm_lin is equivalent to interacting the covariate with the treatment indicator | equivalent | 1.9796 |  | 1 |
+| Figure 17.5 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 |  | 1 |
+| Figure 17.5 | Vertical axis label describes the raw scale as a seven point Likert | 7-point Likert | 100 distinct values over 0.6 to 8.7 | 0 |  |
+| Figure 17.6 | N |  | 1189 |  |  |
+| Figure 17.6 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 |  | 1 |
+| Figure 17.6 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin |  | 1 |
+| Figure 17.7 | N |  | 600 |  |  |
+| Figure 17.7 | N per assigned arm |  | 300 |  |  |
+| Figure 17.7 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 |  | 1 |
+| Figure 17.8 | N |  | 200 |  |  |
+| Figure 17.8 | N missing an outcome |  | 19 |  |  |
+| Figure 17.8 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |  |
+| Figure 17.8 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 |  | 1 |
+| Figure 17.8 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 |  | 1 |
+| Figure 17.8 | The ATE lies somewhere between zero and one | zero and one | 0.00 to 1.14 |  |  |
 
 Ground truth: what the chapter states against what the deposited data
-and scripts produce. A blank Match means the chapter does not state the
-quantity.
+and scripts produce. Both verdict columns blank means the chapter does
+not state the quantity.
 
-Of the 35 recorded claims, 23 state something the chapter can be held
-to. 20 hold and 3 do not. Every one of the eight published figures
+Of the 40 recorded claims, 27 state something the chapter can be held
+to. 21 hold and 6 do not. Every one of the eight published figures
 carries at least one row.
 
 ## The transposed neighborhoods
@@ -335,9 +373,9 @@ The chapter’s discussion of Figure 17.3 reads:
 > neighborhood 2.
 
 | Neighborhood | Residents | Pr(treated) | Effect | SE   | p     |
-|-------------:|----------:|:------------|:-------|:-----|:------|
-|            1 |        50 | 0.50        | -4.36  | 0.79 | 0.000 |
-|            2 |       100 | 0.25        | 0.25   | 0.50 | 0.611 |
+|-------------:|:----------|:------------|:-------|:-----|:------|
+|            1 | 50        | 0.50        | -4.36  | 0.79 | 0.000 |
+|            2 | 100       | 0.25        | 0.25   | 0.50 | 0.611 |
 
 Block-level treatment effects in the deposited blocked dataset.
 
@@ -350,18 +388,59 @@ left facet is labelled “Neighborhood 1” and shows a drop from 10.5 to
 Nothing in the code needs changing and the maintained rewrite reproduces
 the figure as published; the error is in the prose.
 
+## The blocks that are called schools
+
+The very next sentence reads:
+
+> By contrast, in Figure 17.3b, we facet by randomly assigned group, so
+> we compare across schools and within treatment group.
+
+There are no schools in this design. The blocked example has 2
+neighborhoods of 50 and 100 residents, and the horizontal axis of the
+published Figure 17.3b is labelled “Neighborhood 1” and “Neighborhood
+2”. The chapter’s classroom example is the cluster-randomized experiment
+two sections later. The word is a slip in a paragraph that otherwise
+names the neighborhoods correctly four times, but it names a design
+feature the example does not have, which is why it belongs with the
+other corrections rather than in a list of typographical points.
+
+The published panel (b) is also where the deposit falls short of the
+book a second time. `blocked.R` abbreviates the horizontal axis labels
+of that panel to `N/hood 1` and `N/hood 2` while writing panel (a)’s in
+full, so running the deposited script does not produce the published
+labels. Nothing published is wrong here; as with the Figure 17.4 panel
+(b) label below, the published figure is the better one.
+
 ## The 400 to 1600 point scale
 
 The clustered example describes an outcome “measured on a 400-1600-point
 scale”, and both panels of Figure 17.4 set their limits accordingly. The
-simulated outcomes run from 217 to 1720, so eight of the 441 students
-sit outside the stated scale and are clipped out of the figure by
+simulated outcomes run from 217 to 1720, so 8 of the 441 students sit
+outside the stated scale and are clipped out of the figure by
 `coord_cartesian()`. The design draws a classroom shock at
 `rnorm(30, 1000, 100)` and a student shock at `rnorm(n, sd = 175)`,
 which puts about two percent of the distribution outside the range on
 arithmetic alone. The clipping is the chapter’s own choice and the
 rewrite keeps it; the mismatch is between the data and the sentence that
 describes them.
+
+## The Likert scale that is not one
+
+The vertical axis of Figure 17.5 reads
+`Outcome variable (raw scale is 7-point Likert)`. The outcome it plots
+is not a Likert item and is not seven-point. It takes 100 distinct
+values across 100 units, running from 0.6 to 8.7, and 5 of them fall
+outside the 1 to 7 range a seven-point item allows. The generator draws
+it as `Y ~ 0.5 * Z + 1.0 * X + 0.5 * Z * X + U` with a normal covariate
+and a normal disturbance, and the unadjusted facet’s own axis runs from
+0 to 10, which is the shape of a continuous variable rather than an
+ordinal one. The chapter’s only Likert outcome is Figure 17.8’s
+attrition example, which is genuinely seven-point.
+
+`covariate_adjustment.R` writes this label, so the chapter printed what
+its own code gave it, and the maintained rewrite keeps the label as
+deposited rather than silently improving it. Nothing plotted in the
+figure is affected: the correction is to the axis title alone.
 
 ## The relabelled panel
 
@@ -373,13 +452,88 @@ chapter to sentence case, so some difference was expected; what makes
 this one substantive is that the restyling also dropped “classroom
 average”, which is a correction rather than a matter of house style. The
 published figure is the better one and the deposited code does not
-produce it. This is the only place in the archive where running the
-deposited script yields a figure that differs from the published one in
-something other than jitter.
+produce it.
+
+# The extraction and the two instruments
+
+A table of claims can only be as complete as the reading behind it, and
+a table built up figure by figure has no way to notice a sentence nobody
+thought to check. So the chapter was read a second time as an inventory
+rather than as an argument: every numeral in the body text, every number
+spelled out in words, and every quantity a figure asserts without
+printing it, each recorded with where it appears and what kind of claim
+it is. That inventory is `ground_truth/published_claims.csv`, 65 rows,
+hand-reviewed and committed.
+
+| Claim type   | Recomputed | Rows |
+|:-------------|:-----------|-----:|
+| definitional | No         |    5 |
+| definitional | Yes        |   21 |
+| descriptive  | Yes        |   17 |
+| structural   | No         |   13 |
+| structural   | Yes        |    3 |
+| transcribed  | No         |    6 |
+
+The extraction. A claim is recomputed when the pipeline can reach the
+quantity; the rest are verified where they are used, or belong to a
+cited source rather than to this chapter.
+
+No row is typed `pipeline`, and that is the finding rather than an
+oversight: the chapter states no estimate anywhere. What it does state
+is design parameters, response scales, axis labels and claims about the
+shape of its own results, so a check on this chapter is mostly a check
+on whether the simulated data behind a figure are what the surrounding
+sentence says they are. Three of the four errata came out of this pass,
+and only one of them, the transposed neighborhoods, was reachable by
+asking what a figure plots.
+
+Six rows are `transcribed`: Fisher’s eight cups of tea and the four
+assigned to milk first, the seventy ways of allocating them, the MIDA
+framework’s four elements, Healy’s three dimensions of criticism, and
+the differencing intuition from Gerber and Green. These belong to the
+works the chapter cites, cannot drift, and were checked once against
+those works.
+
+`maintained/in_text_claims.R` is the second instrument. It carries 41
+blocks, one for each extraction row the pipeline can reach: the
+published sentence verbatim in a comment, then code that reads
+`maintained/output/` and prints the quantity in the chapter’s own units,
+labelled. It recomputes nothing. Estimation happens once, in the figure
+scripts; only derivation happens twice, and it takes a different route
+each time. The chapter’s two group sizes, for instance, are read out of
+the deposited dataset by `text_design_parameters.R` and recovered here
+from the residual degrees of freedom of the two regressions Figure 17.1
+plots. The confidence level the chapter calls 95 per cent is recovered
+from the interval half-widths rather than asserted. The imputation range
+behind the extreme value bounds is recovered from the distance between
+the two bounds and the number of missing outcomes, without knowing how
+those missing outcomes split across arms.
+
+`build_ground_truth.R` ends by running that file as a program, not by
+reading it as text, since a block that errors or prints nothing would
+satisfy any textual check. It captures what the file prints and requires
+three things: that the number of claims printed equal the number of
+extraction rows needing a block, and that the two sets of identifiers be
+equal in both directions; that the chapter’s own values, transcribed
+independently into the extraction and into the ground truth, agree
+string for string; and that wherever both instruments arrive at a bare
+number, they agree at the precision the extraction records for that
+claim. The claims file is sourced into its own environment, because the
+two files necessarily read the same outputs and name the same things,
+and a bare `source()` would replace the build’s objects with the claims
+file’s before any of those assertions ran.
+
+Of the failing claims, four fail in a way that is the chapter’s own
+rather than the deposit’s or the environment’s. Those are set out in
+`coppock_2021_errata.pdf` at the root of this repository: the published
+sentence, the corrected sentence with the changed token in bold, and the
+evidence. Every number in that document is computed from
+`maintained/output/` when it is rendered, including the numbers that
+were not wrong. None of the four changes a conclusion of the chapter.
 
 # Maintained rewrite
 
-The rewrite lives in `maintained/`: seven figure scripts, two scripts
+The rewrite lives in `maintained/`: seven figure scripts, four scripts
 for quantities that belong to no single figure, a port of the data
 generator, and a shared `helpers.R`. It is a translation, not a
 reanalysis: every estimator and every plotted quantity is the one the
@@ -395,6 +549,8 @@ chapter used.
 | figure_7_noncompliance.R | Figure 17.7, both panels |
 | figure_8_attrition.R | Figure 17.8 |
 | text_design_parameters.R | The design facts the chapter states in prose |
+| text_descriptive_claims.R | The three response scales the chapter states a bound for |
+| in_text_claims.R | The claim-by-claim audit trail, and the coverage gate’s input |
 | text_stata_equivalent.R | The deposited Stata file’s estimator, in R, against the R script’s |
 | text_archive_agreement.R | Every figure’s estimates re-derived from the deposit, against the rewrite’s |
 | make_datasets.R | The seven simulated datasets, regenerated under the current DeclareDesign API |
@@ -557,18 +713,23 @@ style="width:100.0%"
 alt="Figure 17.4 as reproduced by the maintained rewrite: cluster means with cluster-robust intervals, then students with intervals that ignore the clustering. Both carry the deposited script’s axis label; the published panel (b) does not." />
 
 All fourteen panels reproduce the published figures. Beyond the seeded
-jitter and the Figure 17.4 axis label, no panel differs from its
-published counterpart.
+jitter, the two axis labels the book improved on, and the Figure 17.5
+axis label that neither the book nor the deposit got right, no panel
+differs from its published counterpart.
 
 | Figure | Quantity | Value in the deposited data |
 |:---|:---|:---|
 | Figure 17.1 | N | 500 |
 | Figure 17.1 | N treated | 100 |
+| Figure 17.1 | Number of distinct outcome values | 2 |
+| Figure 17.1 | Outcome range | 0 to 1 |
 | Figures 17.2 and 17.3 | N | 150 |
 | Figures 17.2 and 17.3 | Number of neighborhoods | 2 |
 | Figures 17.2 and 17.3 | N in neighborhood 1 | 50 |
 | Figures 17.2 and 17.3 | N in neighborhood 2 | 100 |
 | Figures 17.2 and 17.3 | N treated per neighborhood | 25 |
+| Figures 17.2 and 17.3 | Outcome range | 1 to 16 |
+| Figures 17.2 and 17.3 | Number of non-integer outcomes | 0 |
 | Figure 17.4 | N students | 441 |
 | Figure 17.4 | Number of classes | 30 |
 | Figure 17.4 | Smallest class | 10 |
@@ -576,6 +737,7 @@ published counterpart.
 | Figure 17.4 | Outcome range | 217 to 1720 |
 | Figure 17.5 | N | 100 |
 | Figure 17.5 | Number of distinct outcome values | 100 |
+| Figure 17.5 | Outcome range | 0.6 to 8.7 |
 | Figure 17.6 | N | 1189 |
 | Figure 17.7 | N | 600 |
 | Figure 17.7 | N assigned to treatment | 300 |
@@ -600,31 +762,36 @@ Design parameters read off the deposited datasets by the in-text script.
 | Figures 17.2 and 17.3 | N in neighborhood 2 | 100 | 100 | 1 |  |
 | Figures 17.2 and 17.3 | N treated per neighborhood | 25 | 25 | 1 |  |
 | Figures 17.2 and 17.3 | N total |  | 150 |  |  |
-| Figure 17.2 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 | 1 |  |
-| Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 | 1 |  |
-| Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 | 1 |  |
-| Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 | 0 | paper_internal |
+| Figure 17.2 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 |  |  |
+| Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  |  |
+| Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 |  |  |
+| Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | paper_internal |
+| Figure 17.3 | Panel b compares across schools | schools | N/hood 1, N/hood 2 |  | paper_internal |
+| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | N/hood 1, N/hood 2 | 0 | archive |
 | Figure 17.4 | Number of classes |  | 30 |  |  |
 | Figure 17.4 | N students |  | 441 |  |  |
 | Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 | paper_internal |
-| Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both | 1 |  |
-| Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 | 1 |  |
+| Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  |  |
+| Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  |  |
 | Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: Classroom Average SAT score | 0 | archive |
-| Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 | 1 |  |
+| Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  |  |
 | Figure 17.5 | N |  | 100 |  |  |
-| Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 | 1 |  |
-| Figure 17.5 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 | 1 |  |
+| Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  |  |
+| Figure 17.5 | lm_lin is equivalent to interacting the covariate with the treatment indicator | equivalent | 1.9796 |  |  |
+| Figure 17.5 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 |  |  |
+| Figure 17.5 | Vertical axis label describes the raw scale as a seven point Likert | 7-point Likert | 100 distinct values over 0.6 to 8.7 | 0 | paper_internal |
 | Figure 17.6 | N |  | 1189 |  |  |
-| Figure 17.6 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 | 1 |  |
-| Figure 17.6 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin | 1 |  |
+| Figure 17.6 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 |  |  |
+| Figure 17.6 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin |  |  |
 | Figure 17.7 | N |  | 600 |  |  |
 | Figure 17.7 | N per assigned arm |  | 300 |  |  |
-| Figure 17.7 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 | 1 |  |
+| Figure 17.7 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 |  |  |
 | Figure 17.8 | N |  | 200 |  |  |
 | Figure 17.8 | N missing an outcome |  | 19 |  |  |
 | Figure 17.8 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |  |
-| Figure 17.8 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 | 1 |  |
-| Figure 17.8 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 | 1 |  |
+| Figure 17.8 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 |  |  |
+| Figure 17.8 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 |  |  |
+| Figure 17.8 | The ATE lies somewhere between zero and one | zero and one | 0.00 to 1.14 |  |  |
 
 Maintained rewrite verification: what the chapter states against what
 the rewrite produces.

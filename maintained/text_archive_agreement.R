@@ -154,7 +154,7 @@ agreement <- bind_rows(
     ))
   )
 ) |>
-  arrange(figure)
+  arrange(figure, .locale = "en")
 
 write_csv(agreement, here::here("maintained", "output", "text_archive_agreement.csv"))
 
