@@ -33,6 +33,17 @@ source(here::here("maintained", "text_archive_agreement.R"))
 # last. It is the only script that draws random numbers.
 source(here::here("maintained", "make_datasets.R"))
 
+# Figure timestamps ----
+# R's pdf() device stamps a wall-clock /CreationDate and /ModDate into every figure it
+# writes, and those two fields are the only reason two runs of this pipeline produce
+# differing files. Blanking them lets the determinism check cover every file the
+# pipeline writes rather than all but the figures.
+source(here::here("maintained", "helpers.R"))
+walk(
+  list.files(here::here("maintained", "output"), pattern = "\\.pdf$", full.names = TRUE),
+  blank_pdf_timestamps
+)
+
 # Ground truth ----
 # Rebuilds the comparison table from the outputs above, so it cannot go stale, and
 # ends with the coverage gate, which runs in_text_claims.R and counts what it prints.
