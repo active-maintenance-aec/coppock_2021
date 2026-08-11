@@ -16,8 +16,10 @@ dat <- read_csv(
   show_col_types = FALSE
 ) |>
   mutate(
-    neighborhood_lab = paste0("Neighborhood ", neighborhood),
-    neighborhood_lab2 = paste0("N/hood ", neighborhood)
+    # One label, used by both panels. The deposited script abbreviated panel (b)'s to
+    # "N/hood 1" while writing panel (a)'s in full; the book prints both in full, so
+    # running the deposit does not reproduce the published axis.
+    neighborhood_lab = paste0("Neighborhood ", neighborhood)
   )
 
 # Figure 17.2, weighted against unweighted group means ----
@@ -94,7 +96,7 @@ summary_by_block <- dat |>
   mutate(Y = estimate)
 
 summary_by_cond <- dat |>
-  group_by(condition, neighborhood_lab2) |>
+  group_by(condition, neighborhood_lab) |>
   reframe(tidy(lm_robust(Y ~ 1, data = pick(everything())))) |>
   mutate(Y = estimate)
 
@@ -115,7 +117,7 @@ good_facets <-
   ylab("Outcome variable: count of some behavior")
 
 bad_facets <-
-  ggplot(dat, aes(neighborhood_lab2, Y)) +
+  ggplot(dat, aes(neighborhood_lab, Y)) +
   geom_point(
     position = position_jitter(width = .25, height = .25, seed = 42),
     alpha = 0.1, stroke = 0
@@ -148,7 +150,7 @@ write_csv(
 write_csv(
   bind_rows(
     summary_by_block |> rename(block = neighborhood_lab) |> mutate(panel = "Faceted by block"),
-    summary_by_cond |> rename(block = neighborhood_lab2) |> mutate(panel = "Faceted by condition")
+    summary_by_cond |> rename(block = neighborhood_lab) |> mutate(panel = "Faceted by condition")
   ),
   here::here("maintained", "output", "figure_3_blocked_facets_estimates.csv")
 )

@@ -238,12 +238,13 @@ gt <- tribble(
 
   "fig3b_axis_labels", "Figure 17.3", "Panel b horizontal axis labels",
   paste(compared_units, collapse = ", "), "Neighborhood 1",
-  as.numeric(compared_units[1] == "Neighborhood 1"), NA_real_, "archive",
-  paste0("The deposited script abbreviates the axis labels of panel (b) to \"",
-         compared_units[1], "\" while writing panel (a)'s in full. The published panel (b) ",
-         "reads \"Neighborhood 1\" and \"Neighborhood 2\", so running the deposited script does ",
-         "not produce the published labels. Nothing published is wrong; the deposit is what ",
-         "falls short, as it does for the Figure 17.4 panel (b) label"),
+  as.numeric(compared_units[1] == "Neighborhood 1"), NA_real_,
+  if (compared_units[1] == "Neighborhood 1") "" else "archive",
+  paste0("The deposited script abbreviated the axis labels of panel (b) to \"N/hood 1\" ",
+         "while writing panel (a)'s in full, so running it did not produce the published ",
+         "labels; the rewrite now uses one label for both panels and reproduces them. ",
+         "Nothing published was ever wrong here: the deposit was what fell short, as it did ",
+         "for the Figure 17.4 panel (b) label"),
 
   NA_character_, "Figure 17.4", "Number of classes", param("Figure 17.4", "Number of classes"),
   NA_character_, NA_real_, NA_real_, "",
@@ -283,8 +284,10 @@ gt <- tribble(
   "Outcome variable: SAT score",
   as.numeric(str_to_lower(clustered_labels$y_label[clustered_labels$panel == "(b) Individuals"]) ==
                str_to_lower("Outcome variable: SAT score")),
-  NA_real_, "archive",
-  paste0("The deposited script gives both panels the class-mean wording. The book restyled every ",
+  NA_real_,
+  if (str_to_lower(clustered_labels$y_label[clustered_labels$panel == "(b) Individuals"]) ==
+      str_to_lower("Outcome variable: SAT score")) "" else "archive",
+  paste0("The deposited script gave both panels the class-mean wording. The book restyled every ",
          "axis label to sentence case, and in panel (b) the restyling also dropped \"classroom ",
          "average\", which is a correction rather than a house style change, since panel (b) ",
          "plots students. Running the deposited script does not produce the published label"),

@@ -69,7 +69,7 @@ bad <-
     axis.title.x = element_blank(),
     legend.position = "none"
   ) +
-  ylab("Outcome variable: Classroom Average SAT score")
+  ylab("Outcome variable: SAT score")
 
 write_csv(
   bind_rows(
