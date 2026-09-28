@@ -136,7 +136,7 @@ stata_interval_gap <- max(abs(stata_width[[2]] - stata_width[[3]]))
 # lowest occupied covariate bin is the first row.
 lowest_bin_residual <- residuals_binned$mean_residual[1]
 
-fmt <- function(x, digits = 2) formatC(x, format = "f", digits = digits)
+fmt <- function(x, digits = 2) formatC(round(x, digits) + 0, format = "f", digits = digits)
 
 # The rows ----
 # `match` and `holds` are predicates evaluated here, never typed verdicts. A claim

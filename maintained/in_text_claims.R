@@ -45,7 +45,7 @@ says <- function(id) {
 at_digits <- function(id, x) {
   d <- published_claims$digits[published_claims$claim_id == id]
   stopifnot(length(d) == 1, !is.na(d))
-  formatC(x, format = "f", digits = d)
+  formatC(round(x, d) + 0, format = "f", digits = d)
 }
 
 design <- out("text_design_parameters.csv")

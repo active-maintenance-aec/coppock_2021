@@ -133,7 +133,7 @@ the old assignment and sampling syntax behind `legacy = TRUE`.
 Every figure reproduces. What does not is a handful of claims the
 chapter makes about those figures, most of which belong to the chapter
 rather than to the code. Of 40 recorded claims, 27 can be checked
-against the published chapter; 21 hold and 6 do not, four of the latter
+against the published chapter; 23 hold and 4 do not, four of the latter
 being sentences or labels the chapter’s own data contradict. The 13
 remaining are quantities the chapter never states, which is a large
 share, because this is a methods chapter with no tables and no reported
@@ -152,31 +152,32 @@ this repository; none of them changes a conclusion.
 | Figure 17.4 (clustered), panel (b) axis label | The deposited script does not produce the published label |
 | Figure 17.5 (covariate adjustment), estimates | Reproduce |
 | Figure 17.5, vertical axis label | Describes a seven-point Likert raw scale; the outcome takes 100 distinct values |
-| Data generator (seven simulated datasets) | 48 of 60 columns regenerate identically |
+| Data generator (seven simulated datasets) | 15 of 60 columns regenerate identically |
 
 Reproduction verdict by component.
 
-All six failures are worth naming, and four of them are the chapter’s
-own. It says the blocked experiment shows “small effects of treatment in
-neighborhood 1 and large negative effects of treatment in neighborhood
-2”; the two neighborhoods are the other way round, in the deposited
-data, in the deposited generator, and in the published figure. In the
-next sentence it says Figure 17.3b compares “across schools”, of a
-design with 2 neighborhoods and no schools. It says the clustered
-outcome is “measured on a 400-1600-point scale”; 8 of the 441 simulated
-outcomes fall outside it and both panels clip. And the vertical axis of
-Figure 17.5 calls its raw scale a seven-point Likert, where the outcome
-takes 100 distinct values across 100 units.
+All four failures are the chapter’s own. It says the blocked experiment
+shows “small effects of treatment in neighborhood 1 and large negative
+effects of treatment in neighborhood 2”; the two neighborhoods are the
+other way round, in the deposited data, in the deposited generator, and
+in the published figure. In the next sentence it says Figure 17.3b
+compares “across schools”, of a design with 2 neighborhoods and no
+schools. It says the clustered outcome is “measured on a 400-1600-point
+scale”; 8 of the 441 simulated outcomes fall outside it and both panels
+clip. And the vertical axis of Figure 17.5 calls its raw scale a
+seven-point Likert, where the outcome takes 100 distinct values across
+100 units.
 
-The remaining two are the deposit falling short of the book, in the same
-place and in the same direction both times: the deposited scripts label
-two panels less well than the published figures do. `clustered.R` labels
-both panels of Figure 17.4 as classroom averages, while the published
-panel (b), which plots students, is labelled “Outcome variable: SAT
-score”. `blocked.R` abbreviates the horizontal axis of Figure 17.3b to
-“N/hood”, while the published panel spells “Neighborhood” out. In both
-cases the published figure is the better one and running the deposited
-script does not produce it.
+Two further claims hold only because the rewrite departs from the
+deposit, which falls short of the book in the same place and in the same
+direction both times: the deposited scripts label two panels less well
+than the published figures do. `clustered.R` labels both panels of
+Figure 17.4 as classroom averages, while the published panel (b), which
+plots students, is labelled “Outcome variable: SAT score”. `blocked.R`
+abbreviates the horizontal axis of Figure 17.3b to “N/hood”, while the
+published panel spells “Neighborhood” out. In both cases the published
+figure is the better one and running the deposited script does not
+produce it, so the rewrite prints the published labels.
 
 # Chapter overview
 
@@ -328,14 +329,14 @@ judgement about what counts as large.
 | Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  | 1 |
 | Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 |  | 1 |
 | Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | 0 |
-| Figure 17.3 | Panel b compares across schools | schools | N/hood 1, N/hood 2 |  | 0 |
-| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | N/hood 1, N/hood 2 | 0 |  |
+| Figure 17.3 | Panel b compares across schools | schools | Neighborhood 1, Neighborhood 2 |  | 0 |
+| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | Neighborhood 1, Neighborhood 2 | 1 |  |
 | Figure 17.4 | Number of classes |  | 30 |  |  |
 | Figure 17.4 | N students |  | 441 |  |  |
 | Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 |  |
 | Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  | 1 |
 | Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  | 1 |
-| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: Classroom Average SAT score | 0 |  |
+| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: SAT score | 1 |  |
 | Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  | 1 |
 | Figure 17.5 | N |  | 100 |  |  |
 | Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  | 1 |
@@ -360,7 +361,7 @@ and scripts produce. Both verdict columns blank means the chapter does
 not state the quantity.
 
 Of the 40 recorded claims, 27 state something the chapter can be held
-to. 21 hold and 6 do not. Every one of the eight published figures
+to. 23 hold and 4 do not. Every one of the eight published figures
 carries at least one row.
 
 ## The transposed neighborhoods
@@ -624,14 +625,14 @@ faithful-looking port goes wrong; the model calls do not.
 
 | Figure | Quantity | Values | Largest absolute difference |
 |:---|:---|---:|:---|
-| Figure 17.1 | Group means and intervals | 8 | 5.55e-17 |
-| Figure 17.2 | Weighted and unweighted group means | 16 | 5.55e-17 |
-| Figure 17.3 | Group means within each facet | 32 | 0.00e+00 |
+| Figure 17.1 | Group means and intervals | 8 | 0.00e+00 |
+| Figure 17.2 | Weighted and unweighted group means | 16 | 0.00e+00 |
+| Figure 17.3 | Group means within each facet | 32 | 1.78e-15 |
 | Figure 17.4 | Clustered and unclustered group means | 16 | 2.27e-13 |
 | Figure 17.5 | Three covariate adjustment estimators | 12 | 2.22e-16 |
 | Figure 17.6 | CATE across the covariate grid | 51 | 4.44e-16 |
-| Figure 17.7 | Group means by assigned group | 16 | 2.78e-17 |
-| Figure 17.8 | Bounded group means | 16 | 4.44e-16 |
+| Figure 17.7 | Group means by assigned group | 16 | 1.39e-17 |
+| Figure 17.8 | Bounded group means | 16 | 1.39e-17 |
 
 The rewrite’s plotted estimates against the same quantities re-derived
 from the deposit.
@@ -649,40 +650,57 @@ value.
 the archive does, and compares every regenerated column against the
 deposited file.
 
-| Dataset       | Columns | Identical | Columns that differ |
-|:--------------|--------:|----------:|:--------------------|
-| attrition     |      10 |         7 | Z, R, Y             |
-| blocked       |       9 |         9 | none                |
-| clustered     |      11 |         8 | Z, Y, condition     |
-| covariate     |       9 |         6 | Z, Y, condition     |
-| interaction   |      10 |         7 | Z, Y, condition     |
-| noncompliance |       3 |         3 | none                |
-| two_arm       |       8 |         8 | none                |
+| Dataset | Columns | Identical | Columns that differ |
+|:---|---:|---:|:---|
+| attrition | 10 | 2 | U, Y_Z_0, Y_Z_1, R_Z_0, R_Z_1, Z, R, Y |
+| blocked | 9 | 4 | Y_Z_0, Y_Z_1, Z, Y, condition |
+| clustered | 11 | 1 | class, n_per_class, class_shock, student, student_shock, Y_Z_0, Y_Z_1, Z, Y, condition |
+| covariate | 9 | 2 | U, X, Y_Z_0, Y_Z_1, Z, Y, condition |
+| interaction | 10 | 1 | ID, noise, X, Y_Z_1, Y_Z_0, S_inclusion_prob, Z, Y, condition |
+| noncompliance | 3 | 3 | none |
+| two_arm | 8 | 2 | Y_Z_0, Y_Z_1, Z, Z_cond_prob, Y, condition |
 
 The current-API port against the deposited simulated data.
 
-48 of the 60 regenerated columns come back identical to the deposit.
-Every fabricated covariate and every potential outcome reproduces, in
-all seven datasets. What differs is the realised assignment vector in
-four of them, and the columns revealed through it. The pattern is
-specific: `complete_ra(N, m = 100)` and `block_ra(blocks, m = 25)`
-return the assignments the deposit records, while `complete_ra(N)` with
-no `m` and `cluster_ra(clusters)` do not. The drift is in `randomizr`,
-not in R’s sampler. Running the repaired generator under
-`RNGkind(sample.kind = "Rounding")`, which restores the pre-3.6
-`sample()`, makes matters worse rather than better: the blocked dataset
-stops reproducing too. Since the analysis scripts read the deposited
-files rather than these, no published figure depends on the difference.
+15 of the 60 regenerated columns come back identical to the deposit
+under `fabricatr` 2.0.0. What survives is what the shift does not reach:
+the two-arm dataset’s `ID` and `U`, which are drawn before anything
+else; the `ID` columns of the covariate and attrition datasets; the
+blocked dataset’s fixed neighbourhood structure; the assignment
+probabilities in five of the six datasets that record one; and the
+noncompliance data, which the generator writes out as a literal table.
+Everything else moves because `fabricatr` 2.0.0 no longer spends two
+uniforms naming a workspace slot each time `fabricate()` starts from an
+existing data frame, which DeclareDesign’s potential-outcome, assignment
+and reveal steps all do. Every draw after the first such step therefore
+lands earlier in the stream than it did under 1.x, and since all seven
+designs share one seed, the shift carries from each design into the
+next. The `fabricatr` NEWS states the change and says a stored seed
+should not be expected to reproduce across it.
 
-Two details of the port are worth recording because they are the reason
-it reproduces anything at all.
+Under `fabricatr` 1.0.2 the same generator reproduced 48 of the 60
+columns. Every fabricated covariate and every potential outcome came
+back, in all seven datasets, and what differed was the realised
+assignment vector in four of them and the columns revealed through it.
+That pattern was specific: `complete_ra(N, m = 100)` and
+`block_ra(blocks, m = 25)` return the assignments the deposit records,
+while `complete_ra(N)` with no `m` and `cluster_ra(clusters)` do not.
+That drift is in `randomizr`, not in R’s sampler. Running the repaired
+generator under `RNGkind(sample.kind = "Rounding")`, which restores the
+pre-3.6 `sample()`, made matters worse rather than better: the blocked
+dataset stopped reproducing too. Since the analysis scripts read the
+deposited files rather than these, no published figure depends on either
+difference.
+
+Two details of the port are worth recording because they were the reason
+it reproduced anything at all under `fabricatr` 1.0.2.
 
 The reveal steps use `declare_reveal()` rather than
 `declare_measurement()` with `reveal_outcomes()`. The two are equivalent
 here, but the second draws two extra random numbers per design, which
-moves every design after the first off the archive’s random number
-stream and makes the comparison above uniformly negative for reasons
-that have nothing to do with the deposit.
+moved every design after the first off the archive’s random number
+stream and made the 1.0.2 comparison uniformly negative for reasons that
+have nothing to do with the deposit.
 
 The generator’s blocked section prints two regressions before moving on,
 and the inverse-probability-weighted one draws two random numbers on its
@@ -690,7 +708,7 @@ way through `estimatr`. Those draws sit in the stream between the
 blocked design and every design declared after it, so the deposited data
 depend on a diagnostic call that computes nothing the file needs. The
 port keeps the pair and writes their output out rather than printing it.
-This is a real property of the deposit worth stating plainly: five of
+Under `fabricatr` 1.0.2 this is a real property of the deposit: five of
 its seven datasets cannot be regenerated by any script that tidies away
 a dead `print()`.
 
@@ -766,14 +784,14 @@ Design parameters read off the deposited datasets by the in-text script.
 | Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  |  |
 | Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 |  |  |
 | Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | paper_internal |
-| Figure 17.3 | Panel b compares across schools | schools | N/hood 1, N/hood 2 |  | paper_internal |
-| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | N/hood 1, N/hood 2 | 0 | archive |
+| Figure 17.3 | Panel b compares across schools | schools | Neighborhood 1, Neighborhood 2 |  | paper_internal |
+| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | Neighborhood 1, Neighborhood 2 | 1 |  |
 | Figure 17.4 | Number of classes |  | 30 |  |  |
 | Figure 17.4 | N students |  | 441 |  |  |
 | Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 | paper_internal |
 | Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  |  |
 | Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  |  |
-| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: Classroom Average SAT score | 0 | archive |
+| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: SAT score | 1 |  |
 | Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  |  |
 | Figure 17.5 | N |  | 100 |  |  |
 | Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  |  |
@@ -809,7 +827,7 @@ label the code does not produce.
 |:----------|:-----------------------|
 | R version | 4.6.0                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-08-03             |
+| Date run  | 2026-09-28             |
 
 | Package       | Version |
 |:--------------|:--------|
@@ -817,12 +835,12 @@ label the code does not produce.
 | dplyr         | 1.2.1   |
 | ggplot2       | 4.0.3   |
 | tidyr         | 1.3.2   |
-| estimatr      | 1.0.6   |
+| estimatr      | 2.0.1   |
 | broom         | 1.0.13  |
 | margins       | 0.3.28  |
 | DeclareDesign | 1.1.1   |
-| randomizr     | 1.0.1   |
-| fabricatr     | 1.0.2   |
+| randomizr     | 2.0.1   |
+| fabricatr     | 2.0.0   |
 | here          | 1.0.2   |
 
 Package versions used for the run behind this report.
