@@ -6,6 +6,7 @@
 # Description: Figure 17.4, a cluster-randomized experiment drawn well and drawn badly.
 
 source(here::here("maintained", "helpers.R"))
+source(here::here("maintained", "position_jitter_ellipse.R"))
 
 dat <- read_csv(
   here::here("original", "replication_archive", "clustered_simulated_data.csv"),
@@ -43,7 +44,7 @@ good <-
   geom_point(
     data = class_level,
     aes(size = n_per_class),
-    position = position_jitter(width = 0.2, height = 0.1, seed = 42),
+    position = position_jitter_ellipse(width = 0.2, height = 0, seed = 42),
     alpha = 0.2, stroke = 0
   ) +
   coord_cartesian(ylim = c(400, 1600)) +
@@ -60,7 +61,7 @@ bad <-
   geom_linerange(aes(ymin = conf.low, ymax = conf.high)) +
   geom_point(
     data = dat,
-    position = position_jitter(width = 0.2, height = 0.1, seed = 42),
+    position = position_jitter_ellipse(width = 0.2, height = 0, seed = 42),
     alpha = 0.2, stroke = 0
   ) +
   coord_cartesian(ylim = c(400, 1600)) +

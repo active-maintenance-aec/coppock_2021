@@ -5,6 +5,7 @@
 #   observations kept visible.
 
 source(here::here("maintained", "helpers.R"))
+source(here::here("maintained", "position_jitter_ellipse.R"))
 
 dat <- read_csv(
   here::here("original", "replication_archive", "attrition_simulated_data.csv"),
@@ -42,7 +43,8 @@ good <-
   geom_point(
     data = gg_df,
     aes(color = Y_missing, shape = Y_missing),
-    position = position_jitter(width = 0.2, height = 0.1, seed = 42),
+    stroke = 0,
+    position = position_jitter_ellipse(width = 0.1, height = 0.12, seed = 42),
     alpha = 0.3
   ) +
   geom_point(size = 3) +

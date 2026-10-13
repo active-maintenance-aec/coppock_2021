@@ -30,11 +30,12 @@ label_df <- tibble(
 lines_df <- bind_rows(anchor_df, label_df)
 
 good <-
-  ggplot(dat, aes(X, Y, shape = condition, group = condition)) +
+  ggplot(dat, aes(X, Y, shape = condition, group = condition, color = condition)) +
   geom_point(alpha = 0.2, stroke = 0) +
-  stat_smooth(method = lm_robust, formula = y ~ x, fullrange = TRUE, color = "black") +
+  stat_smooth(method = lm_robust, formula = y ~ x, fullrange = TRUE) +
   geom_line(data = lines_df) +
   geom_label(data = label_df, aes(label = label)) +
+  scale_color_manual(values = c("#205C8A", "#C67800")) +
   coord_cartesian(xlim = c(-2, 2), ylim = c(-5, 10)) +
   xlab("Continuous pre-treatment covariate") +
   ylab("Outcome") +

@@ -6,6 +6,7 @@
 #   and treatment receipt by assigned group) and badly (turnout by realised receipt).
 
 source(here::here("maintained", "helpers.R"))
+source(here::here("maintained", "position_jitter_ellipse.R"))
 
 dat <- read_csv(
   here::here("original", "replication_archive", "noncompliance_simulated_data.csv"),
@@ -40,8 +41,9 @@ good <-
   ggplot(summary_good, aes(Z, value)) +
   geom_point(
     data = gg_df,
-    position = position_jitter(width = 0.2, height = 0.1, seed = 42),
-    alpha = 0.1
+    stroke = 0,
+    position = position_jitter_ellipse(width = 0.3, height = 0.1, seed = 42),
+    alpha = 0.2
   ) +
   geom_point(size = 3) +
   geom_linerange(aes(ymin = conf.low, ymax = conf.high)) +
@@ -57,8 +59,9 @@ bad <-
   ggplot(summary_bad, aes(Z, Turnout)) +
   geom_point(
     data = dat_bad,
-    position = position_jitter(width = 0.2, height = 0.1, seed = 42),
-    alpha = 0.1
+    stroke = 0,
+    position = position_jitter_ellipse(width = 0.3, height = 0.1, seed = 42),
+    alpha = 0.2
   ) +
   geom_point(size = 3) +
   geom_linerange(aes(ymin = conf.low, ymax = conf.high)) +

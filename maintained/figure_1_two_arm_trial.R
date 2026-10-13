@@ -5,6 +5,7 @@
 # Description: Figure 17.1, a simulated two-arm trial drawn well and drawn badly.
 
 source(here::here("maintained", "helpers.R"))
+source(here::here("maintained", "position_jitter_ellipse.R"))
 
 dat <- read_csv(
   here::here("original", "replication_archive", "two_arm_simulated_data.csv"),
@@ -20,7 +21,8 @@ good <-
   ggplot(summary_df, aes(condition, Y)) +
   geom_point(
     data = dat,
-    position = position_jitter(width = 0.2, height = 0.1, seed = 42),
+    stroke = 0,
+    position = position_jitter_ellipse(width = 0.18, height = 0.1, seed = 42),
     alpha = 0.2
   ) +
   geom_point(size = 3) +

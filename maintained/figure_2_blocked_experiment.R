@@ -10,6 +10,7 @@
 #   together.
 
 source(here::here("maintained", "helpers.R"))
+source(here::here("maintained", "position_jitter_ellipse.R"))
 
 dat <- read_csv(
   here::here("original", "replication_archive", "blocked_simulated_data.csv"),
@@ -58,7 +59,7 @@ good <-
   ggplot(dat, aes(condition, Y)) +
   geom_point(
     aes(size = 1 / Z_cond_prob),
-    position = position_jitter(width = .25, height = .25, seed = 42),
+    position = position_jitter_ellipse(width = .25, height = 0, seed = 42),
     alpha = 0.1,
     stroke = 0
   ) +
@@ -75,7 +76,7 @@ good <-
 bad <-
   ggplot(dat, aes(condition, Y)) +
   geom_point(
-    position = position_jitter(width = .25, height = .1, seed = 42),
+    position = position_jitter_ellipse(width = .25, height = 0, seed = 42),
     alpha = 0.1,
     stroke = 0
   ) +
@@ -103,7 +104,7 @@ summary_by_cond <- dat |>
 good_facets <-
   ggplot(dat, aes(condition, Y)) +
   geom_point(
-    position = position_jitter(width = .25, height = .1, seed = 42),
+    position = position_jitter_ellipse(width = .25, height = 0, seed = 42),
     alpha = 0.1, stroke = 0
   ) +
   facet_wrap(~neighborhood_lab) +
@@ -119,7 +120,7 @@ good_facets <-
 bad_facets <-
   ggplot(dat, aes(neighborhood_lab, Y)) +
   geom_point(
-    position = position_jitter(width = .25, height = .25, seed = 42),
+    position = position_jitter_ellipse(width = .25, height = 0, seed = 42),
     alpha = 0.1, stroke = 0
   ) +
   facet_wrap(~condition) +
