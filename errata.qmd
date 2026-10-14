@@ -125,9 +125,12 @@ entries <- tribble(
     "{target('Figure 17.4', 'Students with an outcome outside the stated 400 to 1600 scale')} ",
     "of the {target('Figure 17.4', 'Students in total')} simulated students score outside 400 ",
     "to 1600. Both panels of Figure 17.4 set their limits at 400 and 1600, so those students ",
-    "are clipped out of the published figure and a reader cannot see them. The clipping is ",
-    "the chapter's own choice about the figure; what is wrong is the sentence's claim about ",
-    "the data."),
+    "are clipped out of the published figure and a reader cannot see them. The clipping ",
+    "changes only what is drawn: the classroom means and their intervals are computed from ",
+    "all {target('Figure 17.4', 'Students in total')} students before plotting, and ",
+    "`coord_cartesian()` zooms the axis without dropping any data, so no plotted estimate ",
+    "moves. The clipping is the chapter's own choice about the figure; what is wrong is the ",
+    "sentence's claim about the data."),
   "clustered_outcome_scale",
 
   4, "description", "pipeline", "full",
@@ -143,7 +146,103 @@ entries <- tribble(
     "axis of the published Figure 17.3b is labelled \"Neighborhood 1\" and \"Neighborhood 2\". ",
     "There are no schools in this design. The chapter's classroom example is the ",
     "cluster-randomized experiment of Figure 17.4, two sections later."),
-  "fig3b_across_schools"
+  "fig3b_across_schools",
+
+  5, "spelling", "reading", "brief",
+  "A doubled \"from\"",
+  "published p. 321",
+  "a population other than the one from which [[from]] the sample was drawn",
+  "a population other than the one from which the sample was drawn",
+  "",
+  "",
+
+  6, "spelling", "reading", "brief",
+  "\"Simply\" for \"simple\"",
+  "published p. 332",
+  "they rely on a relatively [[simply]] logic",
+  "they rely on a relatively [[simple]] logic",
+  "",
+  "",
+
+  7, "label", "reading", "brief",
+  "The subcaption of Figure 17.4a is missing a space and does not say what sets the point size",
+  "published Figure 17.4a, p. 330",
+  "Cluster means are [[plotted,with]] point size proportional to [[size]]",
+  "Cluster means are [[plotted, with]] point size proportional to [[cluster size]]",
+  "Each point in Figure 17.4a is a classroom's mean, drawn in proportion to the number of students in that classroom.",
+  "",
+
+  8, "bibliographic", "reference_audit", "brief",
+  "Sarah Khan's surname is misspelled, in the text and in the reference list",
+  "published pp. 326 and 336",
+  "See, for example, [[Kahn]] (2017)\n\n[[Kahn]], Sarah. 2017.",
+  "See, for example, [[Khan]] (2017)\n\n[[Khan]], Sarah. 2017.",
+  "The author is Sarah Khan (PhD, Columbia University; now at Yale University), who presented the paper under the title cited. It is unpublished and has no DOI.",
+  "",
+
+  9, "bibliographic", "reference_audit", "brief",
+  "Bullock and Ha (2011) is given the wrong pages",
+  "published p. 335",
+  "Cambridge University Press, [[p. 959]].",
+  "Cambridge University Press, [[pp. 508--522]].",
+  "Crossref, doi 10.1017/CBO9780511921452.035: the chapter runs from p. 508 to p. 522.",
+  "",
+
+  10, "bibliographic", "reference_audit", "brief",
+  "Both publishers of Bertin (1967) are misspelled",
+  "published p. 335",
+  "Editions [[Gauthier-Villar]].\n\nReissued in 2010, [[Ersi Press]].",
+  "Editions [[Gauthier-Villars]].\n\nReissued in 2010, [[Esri Press]].",
+  "The first edition was published in Paris by Mouton and Gauthier-Villars, and the English translation was reissued by Esri Press (Redlands, CA).",
+  "",
+
+  11, "bibliographic", "reference_audit", "brief",
+  "Lupi and Posavec (2016) is given the wrong publisher",
+  "published p. 336",
+  "Dear Data. [[San Francisco, CA: Chronicle Books]].",
+  "Dear Data. [[New York: Princeton Architectural Press]].",
+  "Dear Data was published in the United States by Princeton Architectural Press, and in the United Kingdom by Particular Books.",
+  "",
+
+  12, "bibliographic", "reference_audit", "brief",
+  "W. E. B. Du Bois Center (2018) is given the wrong publisher and loses the initials' full stops",
+  "published p. 336",
+  "2018. [[WEB Du Bois's]] Data Portraits: Visualizing Black America. [[San Francisco, CA: Chronicle Books]].",
+  "2018. [[W. E. B. Du Bois's]] Data Portraits: Visualizing Black America. [[New York: Princeton Architectural Press]].",
+  "The book was published by Princeton Architectural Press in 2018, edited by Whitney Battle-Baptiste and Britt Rusert for the W. E. B. Du Bois Center at the University of Massachusetts Amherst.",
+  "",
+
+  13, "bibliographic", "reference_audit", "brief",
+  "Wilkinson's Grammar of Graphics is given the wrong year and place of publication",
+  "published pp. 323 and 336",
+  "(Wilkinson [[2006]])\n\nWilkinson, Leland. [[2006]]. The Grammar of Graphics. [[Berlin: Springer Science+Business Media]].",
+  "(Wilkinson [[2005]])\n\nWilkinson, Leland. [[2005]]. The Grammar of Graphics. [[New York: Springer]].",
+  "Crossref, doi 10.1007/0-387-28695-0: the second edition, Springer New York, 2005.",
+  "",
+
+  14, "bibliographic", "reference_audit", "brief",
+  "Wickham (2016) is given the wrong place of publication",
+  "published p. 336",
+  "Data Analysis. [[Berlin: Springer]].",
+  "Data Analysis. [[Cham: Springer International Publishing]].",
+  "Crossref, doi 10.1007/978-3-319-24277-4: Springer International Publishing, Cham.",
+  "",
+
+  15, "bibliographic", "reference_audit", "brief",
+  "Chambers et al. (1983) is given the wrong place and imprint",
+  "published p. 335",
+  "[[Boston, MA: Wadsworth]].",
+  "[[Belmont, CA: Wadsworth International Group]].",
+  "The 1983 edition was published by Wadsworth International Group in Belmont, California (and by Duxbury Press in Boston).",
+  "",
+
+  16, "bibliographic", "reference_audit", "brief",
+  "Titiunik's given name loses its accent",
+  "published p. 336",
+  "and [[Rocio]] Titiunik",
+  "and [[Rocío]] Titiunik",
+  "Crossref, doi 10.1017/S0003055416000575.",
+  ""
 ) |>
   mutate(across(c(title, published, corrected, note), as.character))
 
@@ -163,13 +262,18 @@ stopifnot(all(cited_ids %in% gt_ids))
 
 # The prose below counts the entries in words, as the note has always done.
 n_entries_word <- c("one", "two", "three", "four", "five", "six", "seven", "eight", "nine",
-                    "ten", "eleven", "twelve")[nrow(entries)]
+                    "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen",
+                    "seventeen", "eighteen", "nineteen", "twenty")[nrow(entries)]
 
 # The spine's markup, resolved for this document.
 bold <- function(x) str_replace_all(x, "\\[\\[(.*?)\\]\\]", "**\\1**")
+
+# An entry that corrects more than one place carries one block per place, separated by a
+# blank line; each stays inside the quotation.
+quote <- function(x) str_replace_all(bold(x), "\n\n", "\n>\n> ")
 ```
 
-This note lists `r n_entries_word` corrections to "Visualize as You Randomize: Design-Based Statistical Graphs for Randomized Experiments," chapter 17 of *Advances in Experimental Political Science* (Druckman and Green, eds., Cambridge University Press, 2021, pp. 320--336), doi [10.1017/9781108777919.022](https://doi.org/10.1017/9781108777919.022). **None of them changes a conclusion of the chapter**, which is a methodological argument about how to draw statistical graphs for randomized experiments and does not rest on any quantity below. Three are sentences that misdescribe the simulated data behind a figure; the fourth is a vertical axis label that misdescribes the outcome it plots. Every figure in the chapter is correct as printed, and none is reprinted here.
+This note lists `r n_entries_word` corrections to "Visualize as You Randomize: Design-Based Statistical Graphs for Randomized Experiments," chapter 17 of *Advances in Experimental Political Science* (Druckman and Green, eds., Cambridge University Press, 2021, pp. 320--336), doi [10.1017/9781108777919.022](https://doi.org/10.1017/9781108777919.022). **None of them changes a conclusion of the chapter**, which is a methodological argument about how to draw statistical graphs for randomized experiments and does not rest on any quantity below. Three are sentences that misdescribe the simulated data behind a figure, and one is a vertical axis label that misdescribes the outcome it plots. The rest are smaller: two typos in the text, a garbled subcaption, and nine errors in the reference list. Every figure in the chapter is correct as printed, and none is reprinted here.
 
 All the data in the chapter are simulated, and the deposited datasets ([10.7910/DVN/VE6VSR](https://doi.org/10.7910/DVN/VE6VSR)) are what the figures are drawn from. Every number in a corrected sentence and in the notes below is computed from those datasets at the time this document is rendered. Bold marks what has changed. The code and output supporting each correction are in the actively maintained replication repository for this chapter, `active-maintenance-aec/coppock_2021`.
 
@@ -193,8 +297,8 @@ cat("\n\n## 2. ", e$title, "\n\nThe vertical axis of Figure 17.5 is labelled:\n\
 ```{r remaining-entries, results="asis"}
 walk(which(entries$entry >= 3), function(i) {
   e <- entries[i, ]
-  cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", bold(e$published),
-      "\n\nCorrected:\n\n> ", bold(e$corrected), "\n\n", e$note, "\n", sep = "")
+  cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", quote(e$published),
+      "\n\nCorrected:\n\n> ", quote(e$corrected), "\n\n", e$note, "\n", sep = "")
 })
 ```
 
