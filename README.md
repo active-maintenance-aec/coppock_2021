@@ -671,12 +671,12 @@ probabilities in five of the six datasets that record one; and the
 noncompliance data, which the generator writes out as a literal table.
 Everything else moves because `fabricatr` 2.0.0 no longer spends two
 uniforms naming a workspace slot each time `fabricate()` starts from an
-existing data frame, which DeclareDesign’s potential-outcome, assignment
-and reveal steps all do. Every draw after the first such step therefore
-lands earlier in the stream than it did under 1.x, and since all seven
-designs share one seed, the shift carries from each design into the
-next. The `fabricatr` NEWS states the change and says a stored seed
-should not be expected to reproduce across it.
+existing data frame, which DeclareDesign’s assignment and reveal steps
+do, as its potential-outcome step did. Every draw after the first such
+step therefore lands earlier in the stream than it did under 1.x, and
+since all seven designs share one seed, the shift carries from each
+design into the next. The `fabricatr` NEWS states the change and says a
+stored seed should not be expected to reproduce across it.
 
 Under `fabricatr` 1.0.2 the same generator reproduced 48 of the 60
 columns. Every fabricated covariate and every potential outcome came
@@ -695,12 +695,17 @@ difference.
 Two details of the port are worth recording because they were the reason
 it reproduced anything at all under `fabricatr` 1.0.2.
 
-The reveal steps use `declare_reveal()` rather than
-`declare_measurement()` with `reveal_outcomes()`. The two are equivalent
-here, but the second draws two extra random numbers per design, which
-moved every design after the first off the archive’s random number
-stream and made the 1.0.2 comparison uniformly negative for reasons that
-have nothing to do with the deposit.
+The 1.x port revealed outcomes with `declare_reveal()` rather than
+`declare_measurement()` with `reveal_outcomes()`, because under
+`fabricatr` 1.0.2 the second form drew two extra random numbers per
+design, which moved every design after the first off the archive’s
+random number stream and made the comparison uniformly negative for
+reasons that have nothing to do with the deposit. DeclareDesign 2.0
+makes `declare_potential_outcomes()` and `declare_reveal()` defunct, so
+the port now declares potential outcomes in the model and reveals them
+in `declare_measurement()`. The swap moves no draw: all seven
+regenerated datasets and the comparison table came back byte-identical
+to those of the 1.x port when the 2.0 port first ran.
 
 The generator’s blocked section prints two regressions before moving on,
 and the inverse-probability-weighted one draws two random numbers on its
@@ -825,22 +830,22 @@ label the code does not produce.
 
 | Item      | Value                  |
 |:----------|:-----------------------|
-| R version | 4.6.0                  |
+| R version | 4.6.1                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-09-28             |
+| Date run  | 2026-11-05             |
 
-| Package       | Version |
-|:--------------|:--------|
-| tidyverse     | 2.0.0   |
-| dplyr         | 1.2.1   |
-| ggplot2       | 4.0.3   |
-| tidyr         | 1.3.2   |
-| estimatr      | 2.0.1   |
-| broom         | 1.0.13  |
-| margins       | 0.3.28  |
-| DeclareDesign | 1.1.1   |
-| randomizr     | 2.0.1   |
-| fabricatr     | 2.0.0   |
-| here          | 1.0.2   |
+| Package       | Version    |
+|:--------------|:-----------|
+| tidyverse     | 2.0.0      |
+| dplyr         | 1.2.1      |
+| ggplot2       | 4.0.3      |
+| tidyr         | 1.3.2      |
+| estimatr      | 2.0.1.9000 |
+| broom         | 1.0.13     |
+| margins       | 0.3.28     |
+| DeclareDesign | 2.0.0      |
+| randomizr     | 2.0.1      |
+| fabricatr     | 2.0.0      |
+| here          | 1.0.2      |
 
 Package versions used for the run behind this report.

@@ -2,14 +2,13 @@
 # Output: output/simulated_data/*.csv, output/make_datasets_deposit_comparison.csv,
 #         output/make_datasets_blocked_diagnostics.csv
 # Depends on: original/replication_archive/*_simulated_data.csv, helpers.R
-# Description: Ports the archive's data generator to the DeclareDesign 1.x API and
+# Description: Ports the archive's data generator to the DeclareDesign 2.0 API and
 #   compares each regenerated dataset against the deposited one, column by column.
 #   The figure scripts read the deposited data, not these; this script exists to
 #   establish whether the generator still generates what was deposited.
-#   Reveal steps use declare_reveal() rather than declare_measurement() with
-#   reveal_outcomes(): the two are equivalent here, but the second draws two extra
-#   random numbers per design and would move every design after the first off the
-#   archive's random number stream, which is the thing this comparison measures.
+#   Potential outcomes are declared in the model and revealed with reveal_outcomes()
+#   in declare_measurement(), because declare_potential_outcomes() and declare_reveal()
+#   are defunct in 2.0.
 
 source(here::here("maintained", "helpers.R"))
 
@@ -20,13 +19,16 @@ set.seed(343)
 
 # Two arm trial ----
 two_arm_design <-
-  declare_model(N = 500, U = rnorm(N)) +
-  declare_potential_outcomes(Y ~ draw_binary(latent = 0.5 * Z + U, link = "probit")) +
+  declare_model(
+    N = 500,
+    U = rnorm(N),
+    potential_outcomes(Y ~ draw_binary(latent = 0.5 * Z + U, link = "probit"))
+  ) +
   declare_assignment(
     Z = complete_ra(N, m = 100),
     Z_cond_prob = obtain_condition_probabilities(declare_ra(N = N, m = 100), Z)
   ) +
-  declare_reveal()
+  declare_measurement(Y = reveal_outcomes(Y ~ Z))
 
 two_arm <- draw_data(two_arm_design) |>
   mutate(condition = if_else(Z == 1, "Treatment", "Control"))
@@ -35,14 +37,16 @@ two_arm <- draw_data(two_arm_design) |>
 blocked_design <-
   declare_model(
     neighborhood = add_level(N = 2, lambda = c(10, 5)),
-    resident = add_level(N = c(50, 100))
+    resident = add_level(
+      N = c(50, 100),
+      potential_outcomes(Y ~ 0 * Z + -4 * Z * (neighborhood == 1) + rpois(N, lambda))
+    )
   ) +
-  declare_potential_outcomes(Y ~ 0 * Z + -4 * Z * (neighborhood == 1) + rpois(N, lambda)) +
   declare_assignment(
     Z = block_ra(blocks = neighborhood, m = 25),
     Z_cond_prob = obtain_condition_probabilities(declare_ra(blocks = neighborhood, m = 25), Z)
   ) +
-  declare_reveal()
+  declare_measurement(Y = reveal_outcomes(Y ~ Z))
 
 blocked <- draw_data(blocked_design) |>
   mutate(condition = if_else(Z == 1, "Treatment", "Control"))
@@ -68,27 +72,34 @@ clustered_design <-
       n_per_class = sample(10:20, size = N, replace = TRUE),
       class_shock = rnorm(N, mean = 1000, sd = 100)
     ),
-    student = add_level(N = n_per_class, student_shock = rnorm(N, sd = 175))
+    student = add_level(
+      N = n_per_class,
+      student_shock = rnorm(N, sd = 175),
+      potential_outcomes(Y ~ 100 * Z + class_shock + student_shock)
+    )
   ) +
-  declare_potential_outcomes(Y ~ 100 * Z + class_shock + student_shock) +
   declare_assignment(
     Z = cluster_ra(clusters = class),
     Z_cond_prob = obtain_condition_probabilities(declare_ra(clusters = class), Z)
   ) +
-  declare_reveal()
+  declare_measurement(Y = reveal_outcomes(Y ~ Z))
 
 clustered <- draw_data(clustered_design) |>
   mutate(condition = if_else(Z == 1, "Treatment", "Control"))
 
 # Covariate adjustment ----
 covariate_design <-
-  declare_model(N = 100, U = rnorm(N, sd = 0.5), X = rnorm(N, mean = 3, sd = 1)) +
-  declare_potential_outcomes(Y ~ 0.5 * Z + 1.0 * X + 0.5 * Z * X + U) +
+  declare_model(
+    N = 100,
+    U = rnorm(N, sd = 0.5),
+    X = rnorm(N, mean = 3, sd = 1),
+    potential_outcomes(Y ~ 0.5 * Z + 1.0 * X + 0.5 * Z * X + U)
+  ) +
   declare_assignment(
     Z = complete_ra(N),
     Z_cond_prob = obtain_condition_probabilities(declare_ra(N = N), Z)
   ) +
-  declare_reveal()
+  declare_measurement(Y = reveal_outcomes(Y ~ Z))
 
 covariate <- draw_data(covariate_design) |>
   mutate(condition = if_else(Z == 1, "Treatment", "Control"))
@@ -107,27 +118,34 @@ noncompliance <- tibble(
 # categories the archive relied on are written out here. The breaks are recovered
 # from the deposited file, whose potential outcomes this reproduces exactly.
 attrition_design <-
-  declare_model(N = 200, U = rnorm(N)) +
-  declare_potential_outcomes(
-    Y ~ as.numeric(draw_likert(
-      0.5 * Z + U,
-      breaks = c(-Inf, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, Inf)
-    ))
+  declare_model(
+    N = 200,
+    U = rnorm(N),
+    potential_outcomes(
+      Y ~ as.numeric(draw_likert(
+        0.5 * Z + U,
+        breaks = c(-Inf, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, Inf)
+      ))
+    ),
+    potential_outcomes(R ~ draw_binary(latent = -0.3 * Z + U + 2, link = "probit"))
   ) +
-  declare_potential_outcomes(R ~ draw_binary(latent = -0.3 * Z + U + 2, link = "probit")) +
   declare_assignment(
     Z = complete_ra(N),
     Z_cond_prob = obtain_condition_probabilities(declare_ra(N = N), Z)
   ) +
-  declare_reveal(outcome_variables = "R") +
-  declare_reveal(outcome_variables = "Y", attrition_variables = "R")
+  declare_measurement(
+    R = reveal_outcomes(R ~ Z),
+    Y = if_else(R == 1, reveal_outcomes(Y ~ Z), NA_real_)
+  )
 
 attrition <- draw_data(attrition_design)
 
 # Interaction with a continuous covariate ----
 interaction_design <-
-  declare_model(N = 2500, noise = rnorm(N), X = rnorm(N)) +
-  declare_potential_outcomes(
+  declare_model(
+    N = 2500,
+    noise = rnorm(N),
+    X = rnorm(N),
     Y_Z_1 = 2 * X^2 + 0.50 * X + noise,
     Y_Z_0 = 1.00 * X + noise
   ) +
@@ -140,7 +158,7 @@ interaction_design <-
     Z = complete_ra(N),
     Z_cond_prob = obtain_condition_probabilities(declare_ra(N = N), Z)
   ) +
-  declare_reveal()
+  declare_measurement(Y = reveal_outcomes(Y ~ Z))
 
 interaction <- draw_data(interaction_design) |>
   select(-S) |>
