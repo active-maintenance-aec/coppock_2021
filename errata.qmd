@@ -77,8 +77,15 @@ en_range <- function(s) str_replace(s, " to ", "--")
 # of every note. It is empty where an entry has no ground-truth row, which is normal for a
 # bibliographic or structural entry. ground_truth/build_ground_truth.R refuses to build if
 # any id here is absent from the ground truth.
+#
+# corrected_values runs parallel to claim_ids, one value per id in the same order, carrying
+# the corrected quantity as a number rather than as a sentence. The sentence already holds
+# it, but only inside prose a reader has to parse. Each value comes from the same expression
+# that glues the sentence, so the two cannot be written apart, and the gate below re-checks
+# that each one is still inside the span it belongs to. An entry of a class that changes no
+# quantity carries NA, and so does a note-form entry, which corrects nothing.
 entries <- tribble(
-  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids,
+  ~entry, ~class, ~source, ~form, ~title, ~location, ~published, ~corrected, ~note, ~claim_ids, ~corrected_values,
 
   1, "description", "pipeline", "full",
   "The two neighborhoods are transposed in the discussion of Figure 17.3",
@@ -93,6 +100,7 @@ entries <- tribble(
     "the deposited data generator writes the effect as `-4 * Z * (neighborhood == 1)`. Only ",
     "the sentence describing the figure is wrong."),
   "fig3_block_effects",
+  NA_character_,
 
   2, "label", "pipeline", "brief",
   "The vertical axis of Figure 17.5 misdescribes the raw outcome scale",
@@ -113,6 +121,7 @@ entries <- tribble(
     "what its own code gave it. Nothing plotted in Figure 17.5 changes, and the figure is not ",
     "reprinted: the correction is to the axis title alone."),
   "fig5_axis_label_likert",
+  NA_character_,
 
   3, "definition", "pipeline", "full",
   "The clustered outcome is not confined to the scale the chapter states",
@@ -132,6 +141,7 @@ entries <- tribble(
     "moves. The clipping is the chapter's own choice about the figure; what is wrong is the ",
     "sentence's claim about the data."),
   "clustered_outcome_scale",
+  NA_character_,
 
   4, "description", "pipeline", "full",
   "Figure 17.3b compares neighborhoods, not schools",
@@ -147,6 +157,7 @@ entries <- tribble(
     "There are no schools in this design. The chapter's classroom example is the ",
     "cluster-randomized experiment of Figure 17.4, two sections later."),
   "fig3b_across_schools",
+  NA_character_,
 
   5, "spelling", "reading", "brief",
   "A doubled \"from\"",
@@ -155,6 +166,7 @@ entries <- tribble(
   "a population other than the one from which the sample was drawn",
   "",
   "",
+  NA_character_,
 
   6, "spelling", "reading", "brief",
   "\"Simply\" for \"simple\"",
@@ -163,6 +175,7 @@ entries <- tribble(
   "they rely on a relatively [[simple]] logic",
   "",
   "",
+  NA_character_,
 
   7, "label", "reading", "brief",
   "The subcaption of Figure 17.4a is missing a space and does not say what sets the point size",
@@ -171,6 +184,7 @@ entries <- tribble(
   "Cluster means are [[plotted, with]] point size proportional to [[cluster size]]",
   "Each point in Figure 17.4a is a classroom's mean, drawn in proportion to the number of students in that classroom.",
   "",
+  NA_character_,
 
   8, "bibliographic", "reference_audit", "brief",
   "Sarah Khan's surname is misspelled, in the text and in the reference list",
@@ -179,6 +193,7 @@ entries <- tribble(
   "See, for example, [[Khan]] (2017)\n\n[[Khan]], Sarah. 2017.",
   "The author is Sarah Khan (PhD, Columbia University; now at Yale University), who presented the paper under the title cited. It is unpublished and has no DOI.",
   "",
+  NA_character_,
 
   9, "bibliographic", "reference_audit", "brief",
   "Bullock and Ha (2011) is given the wrong pages",
@@ -187,6 +202,7 @@ entries <- tribble(
   "Cambridge University Press, [[pp. 508--522]].",
   "Crossref, doi 10.1017/CBO9780511921452.035: the chapter runs from p. 508 to p. 522.",
   "",
+  NA_character_,
 
   10, "bibliographic", "reference_audit", "brief",
   "Both publishers of Bertin (1967) are misspelled",
@@ -195,6 +211,7 @@ entries <- tribble(
   "Editions [[Gauthier-Villars]].\n\nReissued in 2010, [[Esri Press]].",
   "The first edition was published in Paris by Mouton and Gauthier-Villars, and the English translation was reissued by Esri Press (Redlands, CA).",
   "",
+  NA_character_,
 
   11, "bibliographic", "reference_audit", "brief",
   "Lupi and Posavec (2016) is given the wrong publisher",
@@ -203,6 +220,7 @@ entries <- tribble(
   "Dear Data. [[New York: Princeton Architectural Press]].",
   "Dear Data was published in the United States by Princeton Architectural Press, and in the United Kingdom by Particular Books.",
   "",
+  NA_character_,
 
   12, "bibliographic", "reference_audit", "brief",
   "W. E. B. Du Bois Center (2018) is given the wrong publisher and loses the initials' full stops",
@@ -211,6 +229,7 @@ entries <- tribble(
   "2018. [[W. E. B. Du Bois's]] Data Portraits: Visualizing Black America. [[New York: Princeton Architectural Press]].",
   "The book was published by Princeton Architectural Press in 2018, edited by Whitney Battle-Baptiste and Britt Rusert for the W. E. B. Du Bois Center at the University of Massachusetts Amherst.",
   "",
+  NA_character_,
 
   13, "bibliographic", "reference_audit", "brief",
   "Wilkinson's Grammar of Graphics is given the wrong year and place of publication",
@@ -219,6 +238,7 @@ entries <- tribble(
   "(Wilkinson [[2005]])\n\nWilkinson, Leland. [[2005]]. The Grammar of Graphics. [[New York: Springer]].",
   "Crossref, doi 10.1007/0-387-28695-0: the second edition, Springer New York, 2005.",
   "",
+  NA_character_,
 
   14, "bibliographic", "reference_audit", "brief",
   "Wickham (2016) is given the wrong place of publication",
@@ -227,6 +247,7 @@ entries <- tribble(
   "Data Analysis. [[Cham: Springer International Publishing]].",
   "Crossref, doi 10.1007/978-3-319-24277-4: Springer International Publishing, Cham.",
   "",
+  NA_character_,
 
   15, "bibliographic", "reference_audit", "brief",
   "Chambers et al. (1983) is given the wrong place and imprint",
@@ -235,6 +256,7 @@ entries <- tribble(
   "[[Belmont, CA: Wadsworth International Group]].",
   "The 1983 edition was published by Wadsworth International Group in Belmont, California (and by Duxbury Press in Boston).",
   "",
+  NA_character_,
 
   16, "bibliographic", "reference_audit", "brief",
   "Titiunik's given name loses its accent",
@@ -242,11 +264,55 @@ entries <- tribble(
   "and [[Rocio]] Titiunik",
   "and [[Rocío]] Titiunik",
   "Crossref, doi 10.1017/S0003055416000575.",
-  ""
+  "",
+  NA_character_
 ) |>
-  mutate(across(c(title, published, corrected, note), as.character))
+  mutate(across(c(title, published, corrected, note, claim_ids, corrected_values),
+                as.character))
 
 stopifnot(nrow(entries) == max(entries$entry), !anyDuplicated(entries$entry))
+
+# Gate: corrected_values agrees with the sentence it was glued into ----
+# The column and the sentence are written from one expression, so they begin in agreement
+# and this gate exists for the edit that separates them: a value moved from one marked span
+# to another, a span reworded to carry a second number, a claim id appended without its
+# value. Each value has to be inside the span it belongs to, matched by position where the
+# counts line up, and inside SOME span where an entry marks a label as well as a number and
+# its spans outnumber its values.
+marked_spans <- function(x) str_match_all(x, "\\[\\[(.*?)\\]\\]")[[1]][, 2]
+
+quantified <- entries |>
+  filter(!is.na(corrected_values)) |>
+  mutate(ids = str_split(claim_ids, ";"), values = str_split(corrected_values, ";"),
+         spans = map(corrected, marked_spans))
+
+stopifnot(all(lengths(quantified$ids) == lengths(quantified$values)))
+
+value_placed <- pmap_lgl(quantified, function(...) {
+  e <- list(...)
+  if (length(e$values) == length(e$spans)) {
+    all(map2_lgl(e$values, e$spans, \(v, s) str_detect(s, fixed(v))))
+  } else {
+    all(map_lgl(e$values, \(v) any(map_lgl(e$spans, \(s) str_detect(s, fixed(v))))))
+  }
+})
+
+if (!all(value_placed)) {
+  print(quantified |> filter(!value_placed) |> select(entry, title, corrected_values, corrected))
+  stop("An entry's corrected_values are not in the spans of its corrected sentence.")
+}
+
+# An entry that changes a quantity has to say which one, and an entry that changes none may
+# not carry a value. The class is the declaration and this is where it binds. A note-form
+# entry corrects nothing, so it carries NA whatever its class. An empty claim_ids is stored
+# as "" and counts as missing here.
+has_ids <- !is.na(entries$claim_ids) & entries$claim_ids != ""
+needs_value <- entries$class == "quantity" & entries$form != "note" & has_ids
+stopifnot(
+  all(!is.na(entries$corrected_values[needs_value])),
+  all(is.na(entries$corrected_values[!needs_value])),
+  all(is.na(entries$corrected_values) | has_ids)
+)
 
 # Every id an entry claims to correct must be a real ground-truth claim. The build gate in
 # ground_truth/build_ground_truth.R checks the same property from the other side; checking it
