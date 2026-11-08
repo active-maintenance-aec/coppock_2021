@@ -66,8 +66,11 @@ en_range <- function(s) str_replace(s, " to ", "--")
 # [[...]] marks the span that changes. Each renderer supplies its own markup for it: bold
 # here. Nothing else in a field is markup, so the same string can be set by any of them.
 #
-# Numbering is the published note's and is APPEND-ONLY: entry 3 can already have been cited,
-# so a later finding is added at the end and never interleaved.
+# Numbering follows PROCEDURES.md Stage 4b: entries are ordered by severity block (quantity;
+# description, interpretation, definition; label, float, cross_reference; wording, spelling,
+# typography; bibliographic), discovery order inside a block, and a finding that lands in an
+# earlier block renumbers the entries after it. Renumbered 2026-11-07; the old-to-new map is
+# in that day's commit message.
 #
 # A published or corrected value that the pipeline computes stays computed: the field is
 # built with str_glue() so the number is produced when this document renders, not typed.
@@ -89,7 +92,7 @@ entries <- tribble(
 
   1, "description", "pipeline", "full",
   "The two neighborhoods are transposed in the discussion of Figure 17.3",
-  "published Section 17.5.2, p. 328",
+  "p. 328, Section 17.5.2",
   "In Figure 17.3a, we facet by block. Within each facet, the groups that are compared are formed by random assignment: we see small effects of treatment in neighborhood [[1]] and large negative effects of treatment in neighborhood [[2]].",
   "In Figure 17.3a, we facet by block. Within each facet, the groups that are compared are formed by random assignment: we see small effects of treatment in neighborhood [[2]] and large negative effects of treatment in neighborhood [[1]].",
   str_glue(
@@ -102,9 +105,45 @@ entries <- tribble(
   "fig3_block_effects",
   NA_character_,
 
-  2, "label", "pipeline", "brief",
+  2, "definition", "pipeline", "full",
+  "The clustered outcome is not confined to the scale the chapter states",
+  "p. 329, Section 17.5.3",
+  "In this example, we imagine a \"test-prep\" treatment that is randomly assigned to some classrooms but not to others; the outcome is measured on a [[400--1600]]-point scale.",
+  str_glue("In this example, we imagine a \"test-prep\" treatment that is randomly assigned to some classrooms but not to others; the outcome is measured on a [[{en_range(param('Figure 17.4', 'Outcome range'))}]]-point scale."),
+  str_glue(
+    "The example intends the SAT scale, and the deposited generator does not enforce it: it ",
+    "draws a classroom shock and a student shock from unbounded normal distributions, so ",
+    "{target('Figure 17.4', 'Students with an outcome outside the stated 400 to 1600 scale')} ",
+    "of the {target('Figure 17.4', 'Students in total')} simulated students score outside 400 ",
+    "to 1600. Both panels of Figure 17.4 set their limits at 400 and 1600, so those students ",
+    "are clipped out of the published figure and a reader cannot see them. The clipping ",
+    "changes only what is drawn: the classroom means and their intervals are computed from ",
+    "all {target('Figure 17.4', 'Students in total')} students before plotting, and ",
+    "`coord_cartesian()` zooms the axis without dropping any data, so no plotted estimate ",
+    "moves. The clipping is the chapter's own choice about the figure; what is wrong is the ",
+    "sentence's claim about the data."),
+  "clustered_outcome_scale",
+  NA_character_,
+
+  3, "description", "pipeline", "full",
+  "Figure 17.3b compares neighborhoods, not schools",
+  "p. 328, Section 17.5.2",
+  "By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across [[schools]] and within treatment group.",
+  "By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across [[neighborhoods]] and within treatment group.",
+  str_glue(
+    "The blocked example has ",
+    "{param('Figures 17.2 and 17.3', 'Number of neighborhoods')} neighborhoods, of ",
+    "{param('Figures 17.2 and 17.3', 'N in neighborhood 1')} and ",
+    "{param('Figures 17.2 and 17.3', 'N in neighborhood 2')} residents, and the horizontal ",
+    "axis of the published Figure 17.3b is labelled \"Neighborhood 1\" and \"Neighborhood 2\". ",
+    "There are no schools in this design. The chapter's classroom example is the ",
+    "cluster-randomized experiment of Figure 17.4, two sections later."),
+  "fig3b_across_schools",
+  NA_character_,
+
+  4, "label", "pipeline", "brief",
   "The vertical axis of Figure 17.5 misdescribes the raw outcome scale",
-  "published Figure 17.5, p. 330",
+  "p. 330, Figure 17.5",
   "Outcome variable [[(raw scale is 7-point Likert)]]",
   str_glue("Outcome variable [[(raw scale is continuous, {en_range(param('Figure 17.5', 'Outcome range'))})]]"),
   str_glue(
@@ -123,72 +162,36 @@ entries <- tribble(
   "fig5_axis_label_likert",
   NA_character_,
 
-  3, "definition", "pipeline", "full",
-  "The clustered outcome is not confined to the scale the chapter states",
-  "published Section 17.5.3, p. 329",
-  "In this example, we imagine a \"test-prep\" treatment that is randomly assigned to some classrooms but not to others; the outcome is measured on a [[400--1600]]-point scale.",
-  str_glue("In this example, we imagine a \"test-prep\" treatment that is randomly assigned to some classrooms but not to others; the outcome is measured on a [[{en_range(param('Figure 17.4', 'Outcome range'))}]]-point scale."),
-  str_glue(
-    "The example intends the SAT scale, and the deposited generator does not enforce it: it ",
-    "draws a classroom shock and a student shock from unbounded normal distributions, so ",
-    "{target('Figure 17.4', 'Students with an outcome outside the stated 400 to 1600 scale')} ",
-    "of the {target('Figure 17.4', 'Students in total')} simulated students score outside 400 ",
-    "to 1600. Both panels of Figure 17.4 set their limits at 400 and 1600, so those students ",
-    "are clipped out of the published figure and a reader cannot see them. The clipping ",
-    "changes only what is drawn: the classroom means and their intervals are computed from ",
-    "all {target('Figure 17.4', 'Students in total')} students before plotting, and ",
-    "`coord_cartesian()` zooms the axis without dropping any data, so no plotted estimate ",
-    "moves. The clipping is the chapter's own choice about the figure; what is wrong is the ",
-    "sentence's claim about the data."),
-  "clustered_outcome_scale",
-  NA_character_,
-
-  4, "description", "pipeline", "full",
-  "Figure 17.3b compares neighborhoods, not schools",
-  "published Section 17.5.2, p. 328",
-  "By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across [[schools]] and within treatment group.",
-  "By contrast, in Figure 17.3b, we facet by randomly assigned group, so we compare across [[neighborhoods]] and within treatment group.",
-  str_glue(
-    "The blocked example has ",
-    "{param('Figures 17.2 and 17.3', 'Number of neighborhoods')} neighborhoods, of ",
-    "{param('Figures 17.2 and 17.3', 'N in neighborhood 1')} and ",
-    "{param('Figures 17.2 and 17.3', 'N in neighborhood 2')} residents, and the horizontal ",
-    "axis of the published Figure 17.3b is labelled \"Neighborhood 1\" and \"Neighborhood 2\". ",
-    "There are no schools in this design. The chapter's classroom example is the ",
-    "cluster-randomized experiment of Figure 17.4, two sections later."),
-  "fig3b_across_schools",
-  NA_character_,
-
-  5, "spelling", "reading", "brief",
-  "A doubled \"from\"",
-  "published p. 321",
-  "a population other than the one from which [[from]] the sample was drawn",
-  "a population other than the one from which the sample was drawn",
-  "",
-  "",
-  NA_character_,
-
-  6, "spelling", "reading", "brief",
-  "\"Simply\" for \"simple\"",
-  "published p. 332",
-  "they rely on a relatively [[simply]] logic",
-  "they rely on a relatively [[simple]] logic",
-  "",
-  "",
-  NA_character_,
-
-  7, "label", "reading", "brief",
+  5, "label", "reading", "brief",
   "The subcaption of Figure 17.4a is missing a space and does not say what sets the point size",
-  "published Figure 17.4a, p. 330",
+  "p. 330, Figure 17.4a",
   "Cluster means are [[plotted,with]] point size proportional to [[size]]",
   "Cluster means are [[plotted, with]] point size proportional to [[cluster size]]",
   "Each point in Figure 17.4a is a classroom's mean, drawn in proportion to the number of students in that classroom.",
   "",
   NA_character_,
 
+  6, "spelling", "reading", "brief",
+  "A doubled \"from\"",
+  "p. 321",
+  "a population other than the one from which [[from]] the sample was drawn",
+  "a population other than the one from which the sample was drawn",
+  "",
+  "",
+  NA_character_,
+
+  7, "spelling", "reading", "brief",
+  "\"Simply\" for \"simple\"",
+  "p. 332",
+  "they rely on a relatively [[simply]] logic",
+  "they rely on a relatively [[simple]] logic",
+  "",
+  "",
+  NA_character_,
+
   8, "bibliographic", "reference_audit", "brief",
   "Sarah Khan's surname is misspelled, in the text and in the reference list",
-  "published pp. 326 and 336",
+  "pp. 326 and 336",
   "See, for example, [[Kahn]] (2017)\n\n[[Kahn]], Sarah. 2017.",
   "See, for example, [[Khan]] (2017)\n\n[[Khan]], Sarah. 2017.",
   "The author is Sarah Khan (PhD, Columbia University; now at Yale University), who presented the paper under the title cited. It is unpublished and has no DOI.",
@@ -197,7 +200,7 @@ entries <- tribble(
 
   9, "bibliographic", "reference_audit", "brief",
   "Bullock and Ha (2011) is given the wrong pages",
-  "published p. 335",
+  "p. 335",
   "Cambridge University Press, [[p. 959]].",
   "Cambridge University Press, [[pp. 508--522]].",
   "Crossref, doi 10.1017/CBO9780511921452.035: the chapter runs from p. 508 to p. 522.",
@@ -206,7 +209,7 @@ entries <- tribble(
 
   10, "bibliographic", "reference_audit", "brief",
   "Both publishers of Bertin (1967) are misspelled",
-  "published p. 335",
+  "p. 335",
   "Editions [[Gauthier-Villar]].\n\nReissued in 2010, [[Ersi Press]].",
   "Editions [[Gauthier-Villars]].\n\nReissued in 2010, [[Esri Press]].",
   "The first edition was published in Paris by Mouton and Gauthier-Villars, and the English translation was reissued by Esri Press (Redlands, CA).",
@@ -215,7 +218,7 @@ entries <- tribble(
 
   11, "bibliographic", "reference_audit", "brief",
   "Lupi and Posavec (2016) is given the wrong publisher",
-  "published p. 336",
+  "p. 336",
   "Dear Data. [[San Francisco, CA: Chronicle Books]].",
   "Dear Data. [[New York: Princeton Architectural Press]].",
   "Dear Data was published in the United States by Princeton Architectural Press, and in the United Kingdom by Particular Books.",
@@ -224,7 +227,7 @@ entries <- tribble(
 
   12, "bibliographic", "reference_audit", "brief",
   "W. E. B. Du Bois Center (2018) is given the wrong publisher and loses the initials' full stops",
-  "published p. 336",
+  "p. 336",
   "2018. [[WEB Du Bois's]] Data Portraits: Visualizing Black America. [[San Francisco, CA: Chronicle Books]].",
   "2018. [[W. E. B. Du Bois's]] Data Portraits: Visualizing Black America. [[New York: Princeton Architectural Press]].",
   "The book was published by Princeton Architectural Press in 2018, edited by Whitney Battle-Baptiste and Britt Rusert for the W. E. B. Du Bois Center at the University of Massachusetts Amherst.",
@@ -233,7 +236,7 @@ entries <- tribble(
 
   13, "bibliographic", "reference_audit", "brief",
   "Wilkinson's Grammar of Graphics is given the wrong year and place of publication",
-  "published pp. 323 and 336",
+  "pp. 323 and 336",
   "(Wilkinson [[2006]])\n\nWilkinson, Leland. [[2006]]. The Grammar of Graphics. [[Berlin: Springer Science+Business Media]].",
   "(Wilkinson [[2005]])\n\nWilkinson, Leland. [[2005]]. The Grammar of Graphics. [[New York: Springer]].",
   "Crossref, doi 10.1007/0-387-28695-0: the second edition, Springer New York, 2005.",
@@ -242,7 +245,7 @@ entries <- tribble(
 
   14, "bibliographic", "reference_audit", "brief",
   "Wickham (2016) is given the wrong place of publication",
-  "published p. 336",
+  "p. 336",
   "Data Analysis. [[Berlin: Springer]].",
   "Data Analysis. [[Cham: Springer International Publishing]].",
   "Crossref, doi 10.1007/978-3-319-24277-4: Springer International Publishing, Cham.",
@@ -251,7 +254,7 @@ entries <- tribble(
 
   15, "bibliographic", "reference_audit", "brief",
   "Chambers et al. (1983) is given the wrong place and imprint",
-  "published p. 335",
+  "p. 335",
   "[[Boston, MA: Wadsworth]].",
   "[[Belmont, CA: Wadsworth International Group]].",
   "The 1983 edition was published by Wadsworth International Group in Belmont, California (and by Duxbury Press in Boston).",
@@ -260,7 +263,7 @@ entries <- tribble(
 
   16, "bibliographic", "reference_audit", "brief",
   "Titiunik's given name loses its accent",
-  "published p. 336",
+  "p. 336",
   "and [[Rocio]] Titiunik",
   "and [[Rocío]] Titiunik",
   "Crossref, doi 10.1017/S0003055416000575.",
@@ -347,29 +350,41 @@ All the data in the chapter are simulated, and the deposited datasets ([10.7910/
 # A heading is only a heading when a blank line precedes it, so every emitted entry opens
 # with one.
 e <- entries |> filter(entry == 1)
-cat("\n\n## 1. ", e$title, "\n\n> ", bold(e$published),
+cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", bold(e$published),
     "\n\nCorrected:\n\n> ", bold(e$corrected), "\n\n", e$note, "\n", sep = "")
 ```
 
-```{r entry-2, results="asis"}
+```{r entries-2-3, results="asis"}
+emit <- function(i) {
+  e <- entries[i, ]
+  cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", quote(e$published),
+      "\n\nCorrected:\n\n> ", quote(e$corrected), "\n\n", e$note, "\n", sep = "")
+}
+walk(which(entries$entry %in% 2:3), emit)
+```
+
+```{r entry-4, results="asis"}
 # This entry's published field is an axis label rather than a sentence, so it takes its own
 # lead-in.
-e <- entries |> filter(entry == 2)
-cat("\n\n## 2. ", e$title, "\n\nThe vertical axis of Figure 17.5 is labelled:\n\n> ",
+e <- entries |> filter(entry == 4)
+cat("\n\n## ", e$entry, ". ", e$title, "\n\nThe vertical axis of Figure 17.5 is labelled:\n\n> ",
     bold(e$published), "\n\nCorrected:\n\n> ", bold(e$corrected), "\n\n", e$note, "\n",
     sep = "")
 ```
 
 ```{r remaining-entries, results="asis"}
-walk(which(entries$entry >= 3), function(i) {
-  e <- entries[i, ]
-  cat("\n\n## ", e$entry, ". ", e$title, "\n\n> ", quote(e$published),
-      "\n\nCorrected:\n\n> ", quote(e$corrected), "\n\n", e$note, "\n", sep = "")
-})
+walk(which(entries$entry >= 5), emit)
 ```
 
 ```{r emit-spine}
 # The machine-readable spine, written wherever this document is rendered. Anything else that
 # carries these corrections reads it rather than keeping its own copy, so the two cannot drift.
+# The spine's vocabularies are closed (cleanup of 2026-11-07): a value outside them is a
+# typo, and the edition builders read these columns to shape every entry.
+stopifnot(
+  all(entries$class %in% c("quantity", "description", "interpretation", "definition", "label", "float", "cross_reference", "wording", "spelling", "typography", "bibliographic")),
+  all(entries$form %in% c("full", "brief", "note")),
+  all(entries$source %in% c("pipeline", "reading", "reference_audit", "publisher_record", "authors_archive", "proof"))
+)
 write_csv(entries, here("errata_entries.csv"))
 ```
