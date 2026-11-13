@@ -1,0 +1,9 @@
+float,published_numbers,covered,reproduced_by_rewrite,reproduced_by_archive,plotted,plotted_reproduced,note
+Figure 17.1,0,0,0,0,2,2,"Prints no numbers on its face; plots the two group means, with intervals in panel (a) and as bars in panel (b)."
+Figure 17.2,0,0,0,0,4,4,Prints no numbers on its face; plots weighted and unweighted group means.
+Figure 17.3,0,0,0,0,8,8,Prints no numbers on its face; plots group means within each facet of both panels.
+Figure 17.4,0,0,0,0,4,4,Prints no numbers on its face; plots clustered and unclustered group means.
+Figure 17.5,0,0,0,0,0,0,"Prints no numbers on its face; plots the deposited outcome and its residualised version, and draws no estimate."
+Figure 17.6,0,0,0,0,17,17,Prints no numbers on its face; plotted counts the CATE grid of panel (b). Panel (a) draws the data and two fitted lines.
+Figure 17.7,0,0,0,0,8,4,"Prints no numbers on its face; the agreement check re-derives the by-assigned-group panel only, so the four by-receipt means are plotted but not compared against the deposit."
+Figure 17.8,0,0,0,0,4,4,Prints no numbers on its face; plots the lower and upper bound group means.

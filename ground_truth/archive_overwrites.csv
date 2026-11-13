@@ -1,0 +1,14 @@
+pass,file,effect,matches_deposit
+stripped,attrition_simulated_data.csv,withheld,NA
+stripped,blocked_simulated_data.csv,withheld,NA
+stripped,clustered_simulated_data.csv,withheld,NA
+stripped,covariate_simulated_data.csv,withheld,NA
+stripped,interaction_simulated_data.csv,withheld,NA
+stripped,noncompliance_simulated_data.csv,withheld,NA
+stripped,two_arm_simulated_data.csv,withheld,NA
+as_shipped,blocked_1_bad.pdf,added,NA
+as_shipped,blocked_1_good.pdf,added,NA
+as_shipped,blocked_2_bad.pdf,added,NA
+as_shipped,blocked_2_good.pdf,added,NA
+as_shipped,interactions_bad.pdf,added,NA
+as_shipped,interactions_good.pdf,added,NA

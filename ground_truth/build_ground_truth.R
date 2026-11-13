@@ -1,7 +1,7 @@
 # coppock_2021/ground_truth/build_ground_truth.R
-# Output: ground_truth/coppock_2021_ground_truth.csv
+# Output: ground_truth/coppock_2021_ground_truth.csv, ground_truth/float_coverage.csv
 # Depends on: maintained/output/ (run run_all.R first), ground_truth/published_claims.csv,
-#   maintained/in_text_claims.R
+#   errata_entries.csv, maintained/in_text_claims.R
 # Description: Assemble the ground truth table. Every value_paper entry was read off
 #   the published chapter and is used only as a comparison target; no published value
 #   is an input to any computation here or anywhere in maintained/. Every value_script
@@ -26,6 +26,7 @@
 
 library(here)
 library(tidyverse)
+library(excheckr)
 
 here::i_am("ground_truth/build_ground_truth.R")
 
@@ -33,8 +34,12 @@ out <- function(f) read_csv(here::here("maintained", "output", f), show_col_type
 
 published_claims <- read_csv(
   here::here("ground_truth", "published_claims.csv"),
-  col_types = cols(value_paper = col_character(), .default = col_guess())
+  col_types = cols(value_paper = col_character(), digits = col_integer(),
+                   needs_block = col_logical(), .default = col_character())
 )
+
+errata_spine <- here::here("errata_entries.csv")
+errata <- read_csv(errata_spine, col_types = cols(.default = col_character()))
 
 # Every join below goes through this, so a transcription that finds nothing, or
 # finds too much, stops the build instead of producing a silently short table.
@@ -143,7 +148,7 @@ fmt <- function(x, digits = 2) formatC(round(x, digits) + 0, format = "f", digit
 # about a value is matched at the precision the chapter prints it to and carries a
 # `match`; a claim about shape, sign or ordering carries a `holds` and no `match`.
 gt <- tribble(
-  ~claim_id, ~table_figure, ~claim, ~value_script, ~value_paper, ~match, ~holds, ~defect_locus, ~notes,
+  ~claim_id, ~figure_label, ~claim, ~value_script, ~value_paper, ~match, ~holds, ~defect_locus, ~notes,
 
   "fig1_n", "Figure 17.1", "N", param("Figure 17.1", "N"), "500",
   as.numeric(param("Figure 17.1", "N") == "500"), NA_real_, "",
@@ -440,57 +445,142 @@ gt <- tribble(
 # columns carry the same value and the two match verdicts are the same verdict.
 # `holds` is a single verdict for the same reason: the descriptive claims are about
 # numbers the archive and the rewrite share.
-gt <- gt |>
-  mutate(
-    paper_id = "coppock_2021",
-    value_rewrite = value_script,
-    match_rewrite = match
-  ) |>
-  select(paper_id, claim_id, table_figure, claim, value_script, value_paper, match,
-         value_rewrite, match_rewrite, holds, defect_locus, notes)
-
-# The locus rule, three states. An adverse row must name where the fault lies; a
-# clean match must not, since a locus there would read as a defect; a row with no
-# verdict may, and none here does.
-adverse <- (!is.na(gt$match) & gt$match == 0) |
-  (!is.na(gt$match_rewrite) & gt$match_rewrite == 0) |
-  (!is.na(gt$holds) & gt$holds == 0)
-clean <- (!is.na(gt$match) & gt$match == 1) | (!is.na(gt$holds) & gt$holds == 1)
-stopifnot(
-  all(gt$defect_locus[adverse] != ""),
-  all(gt$defect_locus[clean] == ""),
-  !any(adverse & clean),
-  # A row carries at most one kind of verdict.
-  !any(!is.na(gt$match) & !is.na(gt$holds)),
-  !any(duplicated(gt$claim_id[!is.na(gt$claim_id)]))
-)
-
-write_csv(gt, here::here("ground_truth", "coppock_2021_ground_truth.csv"))
-
 # The errata spine's claim_ids ----
 # errata_entries.csv names, for every published entry, the ground-truth claims it corrects.
 # Every one of those ids has to exist here: a missing one is a typo or a claim that has since
 # been renamed, and a dangling reference inside a document whose whole purpose is correcting
-# the record is worse than a failed build.
-errata_spine <- here::here("errata_entries.csv")
-if (file.exists(errata_spine)) {
-  cited_ids <- read_csv(errata_spine, show_col_types = FALSE)$claim_ids |>
-    str_split(";") |>
-    unlist() |>
-    str_trim() |>
-    discard(\(x) is.na(x) | x == "")
-  dangling <- setdiff(cited_ids, gt$claim_id)
-  if (length(dangling) > 0) print(dangling)
-  stopifnot(length(dangling) == 0)
-}
+# the record is worse than a failed build. The same ids are what make a row corrected_here.
+cited_ids <- errata$claim_ids |>
+  str_split(";") |>
+  unlist() |>
+  str_trim() |>
+  discard(\(x) is.na(x) | x == "")
+dangling <- setdiff(cited_ids, gt$claim_id)
+if (length(dangling) > 0) print(dangling)
+stopifnot(length(dangling) == 0)
 
-print(gt |> select(claim_id, table_figure, claim, value_script, value_paper, match, holds),
+# The canonical columns ----
+# A row the extraction carries takes its location, claim_type and digits from there, so
+# the table reads on its own. A row the extraction does not carry is a quantity the
+# chapter never states: it keeps its figure label as its location and is typed pipeline.
+# disposition is computed from the errata spine, never typed: a row an entry names is
+# corrected_here, and any other row with a locus would need a judgment nobody here has
+# recorded, so it stays NA and is counted below.
+extraction_fields <- published_claims |>
+  select(claim_id, extraction_location = location, claim_type, digits)
+
+gt <- gt |>
+  mutate(
+    paper_id = "coppock_2021",
+    value_rewrite = value_script,
+    match_rewrite = match,
+    across(c(match, match_rewrite, holds), as.logical),
+    defect_locus = na_if(defect_locus, "")
+  ) |>
+  left_join(extraction_fields, by = "claim_id") |>
+  mutate(
+    location = coalesce(extraction_location, figure_label),
+    claim_type = replace_na(claim_type, "pipeline"),
+    digits = if_else(is.na(claim_id), claim_digits(value_paper), digits),
+    disposition = case_when(
+      claim_id %in% cited_ids ~ "corrected_here",
+      .default = NA_character_
+    ),
+    disposition_reason = NA_character_
+  ) |>
+  select(paper_id, claim_id, location, claim_type, claim, value_paper, digits,
+         value_script, match, value_rewrite, match_rewrite, holds, defect_locus,
+         disposition, disposition_reason, notes)
+
+# The locus rule, three states. An adverse row must name where the fault lies; a
+# clean match must not, since a locus there would read as a defect; a row with no
+# verdict may, and none here does.
+adverse <- (!is.na(gt$match) & !gt$match) |
+  (!is.na(gt$match_rewrite) & !gt$match_rewrite) |
+  (!is.na(gt$holds) & !gt$holds)
+clean <- (!is.na(gt$match) & gt$match) | (!is.na(gt$holds) & gt$holds)
+stopifnot(
+  all(!is.na(gt$defect_locus[adverse])),
+  all(is.na(gt$defect_locus[clean])),
+  !any(adverse & clean),
+  # A row carries at most one kind of verdict.
+  !any(!is.na(gt$match) & !is.na(gt$holds)),
+  !any(duplicated(gt$claim_id[!is.na(gt$claim_id)])),
+  all(gt$claim_type %in% c("pipeline", "definitional", "structural", "descriptive",
+                           "transcribed")),
+  all(gt$defect_locus %in% c("archive", "paper_internal", "environment", "rewrite",
+                             "unresolved", "upstream", NA)),
+  # Every row a corrected_here disposition lands on has a locus to correct.
+  all(!is.na(gt$defect_locus[!is.na(gt$disposition)]))
+)
+
+# The disposition gate. A paper_internal row with no disposition is a defect in the
+# chapter that nobody has decided what to do about; the other loci are counted.
+undisposed <- gt |> filter(defect_locus == "paper_internal", is.na(disposition))
+if (nrow(undisposed) > 0) print(undisposed |> select(claim_id, location, claim))
+stopifnot(nrow(undisposed) == 0)
+print(gt |>
+        filter(!is.na(defect_locus)) |>
+        count(defect_locus, disposition = replace_na(disposition, "NA")))
+
+write_csv(gt, here::here("ground_truth", "coppock_2021_ground_truth.csv"))
+
+print(gt |> select(claim_id, location, claim, value_script, value_paper, match, holds),
       n = nrow(gt), width = 200)
-print(str_glue("rows: {nrow(gt)}  match=1: {sum(gt$match == 1, na.rm = TRUE)}  ",
-               "match=0: {sum(gt$match == 0, na.rm = TRUE)}  ",
-               "holds=1: {sum(gt$holds == 1, na.rm = TRUE)}  ",
-               "holds=0: {sum(gt$holds == 0, na.rm = TRUE)}  ",
+print(str_glue("rows: {nrow(gt)}  match TRUE: {sum(gt$match, na.rm = TRUE)}  ",
+               "match FALSE: {sum(!gt$match, na.rm = TRUE)}  ",
+               "holds TRUE: {sum(gt$holds, na.rm = TRUE)}  ",
+               "holds FALSE: {sum(!gt$holds, na.rm = TRUE)}  ",
                "no verdict: {sum(is.na(gt$match) & is.na(gt$holds))}"))
+
+# Float coverage ----
+# The chapter's eight figures print no numbers on their faces beyond axis ticks, so
+# published_numbers is zero throughout and nothing is covered in that sense. What each
+# figure plots is its point estimates with their intervals, and plotted counts those.
+# plotted_reproduced counts the ones text_archive_agreement.R re-derives from the
+# deposited data with the deposited specifications and finds equal to the rewrite's,
+# which the stopifnot near the top of this file already requires of every one it checks.
+plotted_estimates <- tribble(
+  ~float, ~plotted, ~compared_columns, ~note,
+  "Figure 17.1", nrow(two_arm), 4,
+  "Prints no numbers on its face; plots the two group means, with intervals in panel (a) and as bars in panel (b).",
+  "Figure 17.2", nrow(out("figure_2_blocked_estimates.csv")), 4,
+  "Prints no numbers on its face; plots weighted and unweighted group means.",
+  "Figure 17.3", nrow(facet_estimates), 4,
+  "Prints no numbers on its face; plots group means within each facet of both panels.",
+  "Figure 17.4", nrow(clustered), 4,
+  "Prints no numbers on its face; plots clustered and unclustered group means.",
+  "Figure 17.5", 0, 4,
+  "Prints no numbers on its face; plots the deposited outcome and its residualised version, and draws no estimate.",
+  "Figure 17.6", nrow(cates), 3,
+  "Prints no numbers on its face; plotted counts the CATE grid of panel (b). Panel (a) draws the data and two fitted lines.",
+  "Figure 17.7", nrow(noncompliance), 4,
+  "Prints no numbers on its face; the agreement check re-derives the by-assigned-group panel only, so the four by-receipt means are plotted but not compared against the deposit.",
+  "Figure 17.8", nrow(attrition), 4,
+  "Prints no numbers on its face; plots the lower and upper bound group means."
+)
+
+float_coverage <- plotted_estimates |>
+  left_join(agreement |> select(float = figure, n_values), by = "float") |>
+  mutate(
+    published_numbers = 0L,
+    covered = 0L,
+    reproduced_by_rewrite = 0L,
+    reproduced_by_archive = 0L,
+    plotted = as.integer(plotted),
+    plotted_reproduced = as.integer(pmin(plotted, n_values / compared_columns))
+  ) |>
+  select(float, published_numbers, covered, reproduced_by_rewrite, reproduced_by_archive,
+         plotted, plotted_reproduced, note)
+
+stopifnot(
+  nrow(float_coverage) == 8,
+  !anyNA(float_coverage$plotted_reproduced),
+  all(float_coverage$plotted_reproduced <= float_coverage$plotted)
+)
+
+write_csv(float_coverage, here::here("ground_truth", "float_coverage.csv"))
+print(float_coverage |> select(-note))
 
 # Coverage gate ----
 # in_text_claims.R is read as a program, not as text: a block that errors at runtime

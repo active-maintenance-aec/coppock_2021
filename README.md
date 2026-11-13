@@ -29,7 +29,10 @@
 - [Maintained rewrite verification](#maintained-rewrite-verification)
 - [R environment](#r-environment)
 
-**Archived at Zenodo:** [doi:10.5281/zenodo.24168314](https://doi.org/10.5281/zenodo.24168314). This DOI always resolves to the latest release of the maintained version.
+**Archived at Zenodo:**
+[doi:10.5281/zenodo.24168314](https://doi.org/10.5281/zenodo.24168314).
+This DOI always resolves to the latest release of the maintained
+version.
 
 *Drafted by Claude Opus 5 under the supervision of Alex Coppock.*
 
@@ -317,46 +320,46 @@ judgement about what counts as large.
 
 | Location | Claim | Chapter | Archive data | Match | Holds |
 |:---|:---|:---|:---|:---|:---|
-| Figure 17.1 | N | 500 | 500 | 1 |  |
-| Figure 17.1 | N treated | 100 | 100 | 1 |  |
+| Section 17.5.1, p. 326 | N | 500 | 500 | 1 |  |
+| Section 17.5.1, p. 326 | N treated | 100 | 100 | 1 |  |
 | Figure 17.1 | Control group mean |  | 0.515 |  |  |
 | Figure 17.1 | Treatment group mean |  | 0.610 |  |  |
 | Figure 17.1 | The deposited Stata file draws something similar to the R figure |  | intervals differ in width by at most 0.0024 |  |  |
-| Figures 17.2 and 17.3 | Number of neighborhoods | 2 | 2 | 1 |  |
-| Figures 17.2 and 17.3 | N in neighborhood 1 | 50 | 50 | 1 |  |
-| Figures 17.2 and 17.3 | N in neighborhood 2 | 100 | 100 | 1 |  |
-| Figures 17.2 and 17.3 | N treated per neighborhood | 25 | 25 | 1 |  |
+| Section 17.5.2, p. 327 | Number of neighborhoods | 2 | 2 | 1 |  |
+| Section 17.5.2, p. 327 | N in neighborhood 1 | 50 | 50 | 1 |  |
+| Section 17.5.2, p. 327 | N in neighborhood 2 | 100 | 100 | 1 |  |
+| Section 17.5.2, p. 327 | N treated per neighborhood | 25 | 25 | 1 |  |
 | Figures 17.2 and 17.3 | N total |  | 150 |  |  |
-| Figure 17.2 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 |  | 1 |
-| Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  | 1 |
-| Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 |  | 1 |
-| Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | 0 |
-| Figure 17.3 | Panel b compares across schools | schools | Neighborhood 1, Neighborhood 2 |  | 0 |
-| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | Neighborhood 1, Neighborhood 2 | 1 |  |
+| Section 17.5.2, p. 327 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 |  | 1 |
+| Section 17.5.2, p. 328 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  | 1 |
+| Section 17.5.2, p. 328 | Unweighted ATE is close to zero | close to zero | -0.700 |  | 1 |
+| Section 17.5.2, p. 328 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | 0 |
+| Section 17.5.2, p. 328 | Panel b compares across schools | schools | Neighborhood 1, Neighborhood 2 |  | 0 |
+| Figure 17.3, p. 329 | Panel b horizontal axis labels | Neighborhood 1 | Neighborhood 1, Neighborhood 2 | 1 |  |
 | Figure 17.4 | Number of classes |  | 30 |  |  |
 | Figure 17.4 | N students |  | 441 |  |  |
-| Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 |  |
-| Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  | 1 |
-| Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  | 1 |
-| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: SAT score | 1 |  |
-| Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  | 1 |
+| Section 17.5.3, p. 329 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 |  |
+| Section 17.5.3, p. 329 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  | 1 |
+| Section 17.5.3, p. 329 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  | 1 |
+| Figure 17.4, p. 330 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: SAT score | 1 |  |
+| Section 17.5.3, p. 329 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  | 1 |
 | Figure 17.5 | N |  | 100 |  |  |
-| Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  | 1 |
-| Figure 17.5 | lm_lin is equivalent to interacting the covariate with the treatment indicator | equivalent | 1.9796 |  | 1 |
-| Figure 17.5 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 |  | 1 |
-| Figure 17.5 | Vertical axis label describes the raw scale as a seven point Likert | 7-point Likert | 100 distinct values over 0.6 to 8.7 | 0 |  |
+| Section 17.5.4, p. 330 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  | 1 |
+| Section 17.5.4, p. 330 | lm_lin is equivalent to interacting the covariate with the treatment indicator | equivalent | 1.9796 |  | 1 |
+| Section 17.3, p. 324 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 |  | 1 |
+| Figure 17.5, p. 330 | Vertical axis label describes the raw scale as a seven point Likert | 7-point Likert | 100 distinct values over 0.6 to 8.7 | 0 |  |
 | Figure 17.6 | N |  | 1189 |  |  |
-| Figure 17.6 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 |  | 1 |
-| Figure 17.6 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin |  | 1 |
+| Section 17.5.5, p. 331 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 |  | 1 |
+| Section 17.5.5, p. 331 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin |  | 1 |
 | Figure 17.7 | N |  | 600 |  |  |
 | Figure 17.7 | N per assigned arm |  | 300 |  |  |
-| Figure 17.7 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 |  | 1 |
+| Figure 17.7, p. 333 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 |  | 1 |
 | Figure 17.8 | N |  | 200 |  |  |
 | Figure 17.8 | N missing an outcome |  | 19 |  |  |
-| Figure 17.8 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |  |
-| Figure 17.8 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 |  | 1 |
-| Figure 17.8 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 |  | 1 |
-| Figure 17.8 | The ATE lies somewhere between zero and one | zero and one | 0.00 to 1.14 |  |  |
+| Section 17.5.7, p. 332 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |  |
+| Section 17.5.7, p. 333 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 |  | 1 |
+| Section 17.5.7, p. 333 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 |  | 1 |
+| Section 17.5.7, p. 333 | The ATE lies somewhere between zero and one | zero and one | 0.00 to 1.14 |  |  |
 
 Ground truth: what the chapter states against what the deposited data
 and scripts produce. Both verdict columns blank means the chapter does
@@ -777,46 +780,46 @@ Design parameters read off the deposited datasets by the in-text script.
 
 | Location | Claim | Chapter | Rewrite | Match | Locus |
 |:---|:---|:---|:---|:---|:---|
-| Figure 17.1 | N | 500 | 500 | 1 |  |
-| Figure 17.1 | N treated | 100 | 100 | 1 |  |
+| Section 17.5.1, p. 326 | N | 500 | 500 | 1 |  |
+| Section 17.5.1, p. 326 | N treated | 100 | 100 | 1 |  |
 | Figure 17.1 | Control group mean |  | 0.515 |  |  |
 | Figure 17.1 | Treatment group mean |  | 0.610 |  |  |
 | Figure 17.1 | The deposited Stata file draws something similar to the R figure |  | intervals differ in width by at most 0.0024 |  |  |
-| Figures 17.2 and 17.3 | Number of neighborhoods | 2 | 2 | 1 |  |
-| Figures 17.2 and 17.3 | N in neighborhood 1 | 50 | 50 | 1 |  |
-| Figures 17.2 and 17.3 | N in neighborhood 2 | 100 | 100 | 1 |  |
-| Figures 17.2 and 17.3 | N treated per neighborhood | 25 | 25 | 1 |  |
+| Section 17.5.2, p. 327 | Number of neighborhoods | 2 | 2 | 1 |  |
+| Section 17.5.2, p. 327 | N in neighborhood 1 | 50 | 50 | 1 |  |
+| Section 17.5.2, p. 327 | N in neighborhood 2 | 100 | 100 | 1 |  |
+| Section 17.5.2, p. 327 | N treated per neighborhood | 25 | 25 | 1 |  |
 | Figures 17.2 and 17.3 | N total |  | 150 |  |  |
-| Figure 17.2 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 |  |  |
-| Figure 17.2 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  |  |
-| Figure 17.2 | Unweighted ATE is close to zero | close to zero | -0.700 |  |  |
-| Figure 17.3 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | paper_internal |
-| Figure 17.3 | Panel b compares across schools | schools | Neighborhood 1, Neighborhood 2 |  | paper_internal |
-| Figure 17.3 | Panel b horizontal axis labels | Neighborhood 1 | Neighborhood 1, Neighborhood 2 | 1 |  |
+| Section 17.5.2, p. 327 | Probability of treatment is higher in the first neighborhood | higher in the first | 0.50 against 0.25 |  |  |
+| Section 17.5.2, p. 328 | Inverse probability weighted ATE is large and negative | large and negative | -1.284 |  |  |
+| Section 17.5.2, p. 328 | Unweighted ATE is close to zero | close to zero | -0.700 |  |  |
+| Section 17.5.2, p. 328 | Small effect in neighborhood 1 and a large negative effect in neighborhood 2 | small in 1 and large negative in 2 | neighborhood 1 = -4.36; neighborhood 2 = 0.25 |  | paper_internal |
+| Section 17.5.2, p. 328 | Panel b compares across schools | schools | Neighborhood 1, Neighborhood 2 |  | paper_internal |
+| Figure 17.3, p. 329 | Panel b horizontal axis labels | Neighborhood 1 | Neighborhood 1, Neighborhood 2 | 1 |  |
 | Figure 17.4 | Number of classes |  | 30 |  |  |
 | Figure 17.4 | N students |  | 441 |  |  |
-| Figure 17.4 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 | paper_internal |
-| Figure 17.4 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  |  |
-| Figure 17.4 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  |  |
-| Figure 17.4 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: SAT score | 1 |  |
-| Figure 17.4 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  |  |
+| Section 17.5.3, p. 329 | Outcome measured on a 400 to 1600 point scale | 400 to 1600 | 217 to 1720 | 0 | paper_internal |
+| Section 17.5.3, p. 329 | Group means are the same in both panels | the same in both panels | 957.9 and 1117.8 in both |  |  |
+| Section 17.5.3, p. 329 | Panel b confidence intervals ignore clustering and are narrower | narrower | widths 59 and 51 against 174 and 107 |  |  |
+| Figure 17.4, p. 330 | Panel b vertical axis label | Outcome variable: SAT score | Outcome variable: SAT score | 1 |  |
+| Section 17.5.3, p. 329 | Clustering can be handled by clustered standard errors or by weighting class means | either approach | both give 159.884 |  |  |
 | Figure 17.5 | N |  | 100 |  |  |
-| Figure 17.5 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  |  |
-| Figure 17.5 | lm_lin is equivalent to interacting the covariate with the treatment indicator | equivalent | 1.9796 |  |  |
-| Figure 17.5 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 |  |  |
-| Figure 17.5 | Vertical axis label describes the raw scale as a seven point Likert | 7-point Likert | 100 distinct values over 0.6 to 8.7 | 0 | paper_internal |
+| Section 17.5.4, p. 330 | The vertical scale of both facets is the same but their range is not | the same scale but not the same range | 10 units in each facet; 0 to 10 against -5 to 5 |  |  |
+| Section 17.5.4, p. 330 | lm_lin is equivalent to interacting the covariate with the treatment indicator | equivalent | 1.9796 |  |  |
+| Section 17.3, p. 324 | The residual on residual slope equals the multiple regression estimate | exactly equal | 1.9796 |  |  |
+| Figure 17.5, p. 330 | Vertical axis label describes the raw scale as a seven point Likert | 7-point Likert | 100 distinct values over 0.6 to 8.7 | 0 | paper_internal |
 | Figure 17.6 | N |  | 1189 |  |  |
-| Figure 17.6 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 |  |  |
-| Figure 17.6 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin |  |  |
+| Section 17.5.5, p. 331 | Negative effects at low covariate values and positive effects at high ones | negative at low and positive at high | -3.64 at X = -2 and 4.40 at X = 2 |  |  |
+| Section 17.5.5, p. 331 | The linear model fits worst at low covariate values | does not fit well, especially at low values | mean residual 10.16 in the lowest bin |  |  |
 | Figure 17.7 | N |  | 600 |  |  |
 | Figure 17.7 | N per assigned arm |  | 300 |  |  |
-| Figure 17.7 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 |  |  |
+| Figure 17.7, p. 333 | Noncompliance is two-sided | two-sided | treatment arm 0.667 and control arm 0.167 |  |  |
 | Figure 17.8 | N |  | 200 |  |  |
 | Figure 17.8 | N missing an outcome |  | 19 |  |  |
-| Figure 17.8 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |  |
-| Figure 17.8 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 |  |  |
-| Figure 17.8 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 |  |  |
-| Figure 17.8 | The ATE lies somewhere between zero and one | zero and one | 0.00 to 1.14 |  |  |
+| Section 17.5.7, p. 332 | Outcome on a seven point Likert scale | seven point Likert | 2 to 7 | 1 |  |
+| Section 17.5.7, p. 333 | Lower bound group means are very similar and the worst case effect is near zero | very similar and close to zero | 4.35 and 4.35, a difference of 0.00 |  |  |
+| Section 17.5.7, p. 333 | Upper bound effect is close to a full scale point | close to a full-scale point | 1.14 |  |  |
+| Section 17.5.7, p. 333 | The ATE lies somewhere between zero and one | zero and one | 0.00 to 1.14 |  |  |
 
 Maintained rewrite verification: what the chapter states against what
 the rewrite produces.
@@ -832,22 +835,22 @@ label the code does not produce.
 
 | Item      | Value                  |
 |:----------|:-----------------------|
-| R version | 4.6.1                  |
+| R version | 4.6.2                  |
 | Platform  | aarch64-apple-darwin23 |
-| Date run  | 2026-11-05             |
+| Date run  | 2026-11-13             |
 
-| Package       | Version    |
-|:--------------|:-----------|
-| tidyverse     | 2.0.0      |
-| dplyr         | 1.2.1      |
-| ggplot2       | 4.0.3      |
-| tidyr         | 1.3.2      |
-| estimatr      | 2.0.1.9000 |
-| broom         | 1.0.13     |
-| margins       | 0.3.28     |
-| DeclareDesign | 2.0.0      |
-| randomizr     | 2.0.1      |
-| fabricatr     | 2.0.0      |
-| here          | 1.0.2      |
+| Package       | Version |
+|:--------------|:--------|
+| tidyverse     | 2.0.0   |
+| dplyr         | 1.2.1   |
+| ggplot2       | 4.0.3   |
+| tidyr         | 1.3.2   |
+| estimatr      | 2.0.1   |
+| broom         | 1.0.13  |
+| margins       | 0.3.28  |
+| DeclareDesign | 2.0.0   |
+| randomizr     | 2.0.1   |
+| fabricatr     | 2.0.0   |
+| here          | 1.0.2   |
 
 Package versions used for the run behind this report.

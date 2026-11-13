@@ -133,8 +133,8 @@ A successful run overwrites `maintained/output/`, which is committed: **`git dif
 verdict <- coalesce(gt$match, gt$holds)
 n_claims <- nrow(gt)
 n_verifiable <- sum(!is.na(verdict))
-n_match <- sum(verdict == 1, na.rm = TRUE)
-n_fail <- sum(verdict == 0, na.rm = TRUE)
+n_match <- sum(verdict, na.rm = TRUE)
+n_fail <- sum(!verdict, na.rm = TRUE)
 n_unverifiable <- sum(is.na(verdict))
 n_extraction <- nrow(published_claims)
 n_blocks <- sum(published_claims$needs_block)
@@ -289,8 +289,9 @@ The chapter is unusual in what it gives a reader to check. It has no tables, pri
 
 ```{r gt_table}
 gt |>
-  mutate(across(everything(), \(x) replace_na(as.character(x), ""))) |>
-  select(table_figure, claim, value_paper, value_script, match, holds) |>
+  mutate(across(c(match, holds), as.integer),
+         across(everything(), \(x) replace_na(as.character(x), ""))) |>
+  select(location, claim, value_paper, value_script, match, holds) |>
   kable(
     booktabs = TRUE,
     col.names = c("Location", "Claim", "Chapter", "Archive data", "Match", "Holds"),
@@ -583,8 +584,9 @@ design_parameters |>
 
 ```{r rewrite_verify}
 gt |>
-  mutate(across(everything(), \(x) replace_na(as.character(x), ""))) |>
-  select(table_figure, claim, value_paper, value_rewrite, match_rewrite, defect_locus) |>
+  mutate(across(match_rewrite, as.integer),
+         across(everything(), \(x) replace_na(as.character(x), ""))) |>
+  select(location, claim, value_paper, value_rewrite, match_rewrite, defect_locus) |>
   kable(
     booktabs = TRUE,
     col.names = c("Location", "Claim", "Chapter", "Rewrite", "Match", "Locus"),

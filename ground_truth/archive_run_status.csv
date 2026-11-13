@@ -1,0 +1,19 @@
+pass,script,role,exit_status,outcome,stopped_at
+stripped,make_datasets.R,cleaning,1,error,"Error in `declare_potential_outcomes()`: ! `declare_potential_outcomes()` is not a step in DeclareDesign 2.0. ℹ Put potential outcomes in the model, as a formula:"
+stripped,two_arm_trial.R,analysis,1,error,Error: ! 'two_arm_simulated_data.csv' does not exist in current working directory:
+stripped,blocked.R,analysis,1,error,Error: ! 'blocked_simulated_data.csv' does not exist in current working directory:
+stripped,clustered.R,analysis,1,error,Error: ! 'clustered_simulated_data.csv' does not exist in current working directory:
+stripped,covariate_adjustment.R,analysis,1,error,Error: ! 'covariate_simulated_data.csv' does not exist in current working directory:
+stripped,noncompliance.R,analysis,1,error,Error: ! 'noncompliance_simulated_data.csv' does not exist in current working directory:
+stripped,interaction.R,analysis,1,error,Error: ! 'interaction_simulated_data.csv' does not exist in current working directory:
+stripped,attrition.R,analysis,1,error,Error: ! 'attrition_simulated_data.csv' does not exist in current working directory:
+stripped,two_arm_trial.do,analysis,NA,not_run,No Stata here; maintained/text_stata_equivalent.R reproduces its arithmetic in R
+as_shipped,make_datasets.R,cleaning,1,error,"Error in `declare_potential_outcomes()`: ! `declare_potential_outcomes()` is not a step in DeclareDesign 2.0. ℹ Put potential outcomes in the model, as a formula:"
+as_shipped,two_arm_trial.R,analysis,1,error,"Error in tidy(lm_robust(Y ~ 1, data = .)) : could not find function ""tidy"" Calls: source ... eval -> %>% -> mutate -> do -> do.grouped_df -> eval_tidy"
+as_shipped,blocked.R,analysis,0,clean,NA
+as_shipped,clustered.R,analysis,1,error,"Error in tidy(lm_robust(Y ~ 1, clusters = class, data = .)) : could not find function ""tidy"" Calls: source ... eval -> %>% -> mutate -> do -> do.grouped_df -> eval_tidy"
+as_shipped,covariate_adjustment.R,analysis,1,error,"Error in lm_lin(Y ~ Z, covariates = ~X, data = dat) : could not find function ""lm_lin"" Calls: source -> withVisible -> eval -> eval"
+as_shipped,noncompliance.R,analysis,1,error,"Error in tidy(lm_robust(value ~ 1, data = .)) : could not find function ""tidy"" Calls: source ... eval -> %>% -> mutate -> do -> do.grouped_df -> eval_tidy"
+as_shipped,interaction.R,analysis,0,clean,NA
+as_shipped,attrition.R,analysis,1,error,"Error in tidy(lm_robust(value ~ 1, data = .)) : could not find function ""tidy"" Calls: source ... eval -> %>% -> mutate -> do -> do.grouped_df -> eval_tidy"
+as_shipped,two_arm_trial.do,analysis,NA,not_run,No Stata here; maintained/text_stata_equivalent.R reproduces its arithmetic in R
